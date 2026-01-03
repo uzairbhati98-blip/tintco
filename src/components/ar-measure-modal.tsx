@@ -1,14 +1,22 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, CheckCircle2, Loader2, AlertCircle, X } from 'lucide-react'
+import { Camera, CheckCircle2, Loader2, AlertCircle, X, Crosshair } from 'lucide-react'
+import {
+  requestCameraAccess,
+  stopCameraStream,
+  calculateDimensions,
+  calculateDistance,
+  type Point,
+  type MeasurementPoints
+} from '@/lib/ar/camera-utils'
 
-type ARState = 'idle' | 'permissions' | 'launching' | 'measuring' | 'processing' | 'success' | 'error'
+type ARState = 'idle' | 'permissions' | 'calibration' | 'measuring' | 'processing' | 'success' | 'error'
 
 interface ARMeasureModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess: (data: { areaSqM: number; dimensions: string; roomType: string }) => void // FIX: name matches downstream
+  onSuccess: (data: { areaSqM: number; dimensions: string; roomType: string }) => void
   productName: string
 }
 
@@ -20,74 +28,230 @@ export function ARMeasureModal({
 }: ARMeasureModalProps) {
   const [state, setState] = useState<ARState>('idle')
   const [measurements, setMeasurements] = useState({
-    areaSqM: 0,            // FIX: metric naming
+    areaSqM: 0,
     dimensions: '',
     roomType: 'living_room'
   })
   const [progress, setProgress] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
+  
+  // Camera refs
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  
+  // Measurement state
+  const [measurementPoints, setMeasurementPoints] = useState<MeasurementPoints>({
+    widthStart: null,
+    widthEnd: null,
+    heightStart: null,
+    heightEnd: null
+  })
+  const [referencePixels, setReferencePixels] = useState<number>(0)
+  const [currentStep, setCurrentStep] = useState<'reference' | 'width' | 'height'>('reference')
+
+  // Cleanup on unmount or close
+  useEffect(() => {
+    return () => {
+      stopCameraStream(streamRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
       setState('idle')
       setProgress(0)
       setErrorMessage('')
+      setMeasurementPoints({
+        widthStart: null,
+        widthEnd: null,
+        heightStart: null,
+        heightEnd: null
+      })
+      setReferencePixels(0)
+      setCurrentStep('reference')
+    } else {
+      // Stop camera when modal closes
+      stopCameraStream(streamRef.current)
+      streamRef.current = null
     }
   }, [isOpen])
 
-  const checkCameraPermissions = async () => {
-    setState('permissions')
-    await new Promise(r => setTimeout(r, 1000))
-    if (Math.random() > 0.1) return true
-    setState('error')
-    setErrorMessage('Camera permission denied. Please enable camera access in your browser settings.')
-    return false
-  }
-
   const startMeasurement = async () => {
-    const hasPermission = await checkCameraPermissions()
-    if (!hasPermission) return
+    setState('permissions')
+    setProgress(10)
 
-    setState('launching'); setProgress(20)
-    await new Promise(r => setTimeout(r, 1500))
-
-    setState('measuring'); setProgress(40)
-    for (let i = 50; i <= 80; i += 10) {
-      await new Promise(r => setTimeout(r, 500))
-      setProgress(i)
+    // Request camera access
+    const stream = await requestCameraAccess()
+    
+    if (!stream) {
+      setState('error')
+      setErrorMessage('Camera permission denied. Please enable camera access in your browser settings.')
+      return
     }
 
-    setState('processing'); setProgress(90)
-    await new Promise(r => setTimeout(r, 1000))
+    streamRef.current = stream
+    
+    // Wait for video element
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream
+      await videoRef.current.play()
+    }
 
-    // Generate mock metric measurements
-    const mockAreaSqM = Math.floor(Math.random() * 20) + 10 // 10–29 m²
-    const width = Math.floor(Math.random() * 2) + 3         // 3–4 m
-    const height = Math.floor(Math.random() * 2) + 3        // 3–4 m
-    const mockDimensions = `${width}m × ${height}m`
-    const roomTypes = ['living_room', 'bedroom', 'kitchen', 'bathroom', 'office']
-    const mockRoomType = roomTypes[Math.floor(Math.random() * roomTypes.length)]
+    setProgress(30)
+    setState('calibration')
+  }
 
-    setMeasurements({
-      areaSqM: mockAreaSqM,
-      dimensions: mockDimensions,
-      roomType: mockRoomType
-    })
-    setProgress(100)
-    setState('success')
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (state !== 'calibration' && state !== 'measuring') return
 
-    setTimeout(() => {
-      onSuccess({
-        areaSqM: mockAreaSqM,            // FIX: pass metric to downstream
-        dimensions: mockDimensions,
-        roomType: mockRoomType
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * canvas.width
+    const y = ((e.clientY - rect.top) / rect.height) * canvas.height
+
+    const point: Point = { x, y }
+
+    if (state === 'calibration') {
+      // Calibration: tap two corners of credit card
+      if (!measurementPoints.widthStart) {
+        setMeasurementPoints(prev => ({ ...prev, widthStart: point }))
+        drawPoint(point, '#FFCA2C')
+      } else if (!measurementPoints.widthEnd) {
+        setMeasurementPoints(prev => ({ ...prev, widthEnd: point }))
+        drawPoint(point, '#FFCA2C')
+        
+        // Calculate reference distance
+        const refDistance = calculateDistance(measurementPoints.widthStart, point)
+        setReferencePixels(refDistance)
+        
+        // Move to measuring
+        setTimeout(() => {
+          setState('measuring')
+          setProgress(50)
+          setCurrentStep('width')
+          // Reset for actual measurements
+          setMeasurementPoints({
+            widthStart: null,
+            widthEnd: null,
+            heightStart: null,
+            heightEnd: null
+          })
+          clearCanvas()
+        }, 500)
+      }
+    } else if (state === 'measuring') {
+      // Measure wall dimensions
+      if (currentStep === 'width') {
+        if (!measurementPoints.widthStart) {
+          setMeasurementPoints(prev => ({ ...prev, widthStart: point }))
+          drawPoint(point, '#10b981')
+        } else if (!measurementPoints.widthEnd) {
+          setMeasurementPoints(prev => ({ ...prev, widthEnd: point }))
+          drawPoint(point, '#10b981')
+          setCurrentStep('height')
+          setProgress(70)
+        }
+      } else if (currentStep === 'height') {
+        if (!measurementPoints.heightStart) {
+          setMeasurementPoints(prev => ({ ...prev, heightStart: point }))
+          drawPoint(point, '#3b82f6')
+        } else if (!measurementPoints.heightEnd) {
+          setMeasurementPoints(prev => ({ ...prev, heightEnd: point }))
+          drawPoint(point, '#3b82f6')
+          
+          // All points captured - calculate
+          processMeasurements({ ...measurementPoints, heightEnd: point })
+        }
+      }
+    }
+  }
+
+  const drawPoint = (point: Point, color: string) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    ctx.fillStyle = color
+    ctx.beginPath()
+    ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI)
+    ctx.fill()
+
+    // Draw ring
+    ctx.strokeStyle = color
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.arc(point.x, point.y, 15, 0, 2 * Math.PI)
+    ctx.stroke()
+  }
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+  }
+
+  const processMeasurements = async (points: MeasurementPoints) => {
+    setState('processing')
+    setProgress(90)
+
+    try {
+      const result = calculateDimensions(points, referencePixels)
+      
+      setMeasurements({
+        areaSqM: result.areaSqM,
+        dimensions: result.dimensions,
+        roomType: 'living_room'
       })
-      onClose()
-    }, 2500)
+      
+      setProgress(100)
+      setState('success')
+
+      // Stop camera
+      stopCameraStream(streamRef.current)
+      streamRef.current = null
+
+      // Call success after showing results
+      setTimeout(() => {
+        onSuccess({
+          areaSqM: result.areaSqM,
+          dimensions: result.dimensions,
+          roomType: 'living_room'
+        })
+        onClose()
+      }, 2500)
+    } catch (error) {
+      setState('error')
+      setErrorMessage('Failed to calculate measurements. Please try again.')
+    }
   }
 
   const retry = () => {
-    setState('idle'); setProgress(0); setErrorMessage('')
+    setState('idle')
+    setProgress(0)
+    setErrorMessage('')
+    setMeasurementPoints({
+      widthStart: null,
+      widthEnd: null,
+      heightStart: null,
+      heightEnd: null
+    })
+    setReferencePixels(0)
+    setCurrentStep('reference')
+    stopCameraStream(streamRef.current)
+    streamRef.current = null
+  }
+
+  const handleClose = () => {
+    stopCameraStream(streamRef.current)
+    streamRef.current = null
+    onClose()
   }
 
   if (!isOpen) return null
@@ -98,7 +262,7 @@ export function ARMeasureModal({
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Modal */}
@@ -112,7 +276,7 @@ export function ARMeasureModal({
       >
         {/* Progress bar */}
         {progress > 0 && (
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100 z-50">
             <motion.div
               className="h-full bg-brand"
               initial={{ width: 0 }}
@@ -125,8 +289,8 @@ export function ARMeasureModal({
         {/* Close button */}
         {(state === 'idle' || state === 'error') && (
           <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            onClick={handleClose}
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors z-50"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -146,15 +310,15 @@ export function ARMeasureModal({
                 </motion.div>
                 <h3 className="text-2xl font-bold mb-2">AR Measurement</h3>
                 <p className="text-text/70 mb-6">
-                  Instantly measure your space for <span className="font-semibold">{productName}</span>
+                  Measure your space for <span className="font-semibold">{productName}</span>
                 </p>
                 <button
                   onClick={startMeasurement}
                   className="w-full bg-brand hover:bg-brand/90 text-black font-semibold py-4 rounded-2xl transition-all hover:shadow-lg active:scale-95"
                 >
-                  Start AR Camera
+                  Start Camera
                 </button>
-                <p className="mt-4 text-xs text-text/50">Make sure you're in a well-lit room with 3+ meters of space</p>
+                <p className="mt-4 text-xs text-text/50">You'll need a credit card for scale reference</p>
               </motion.div>
             )}
 
@@ -171,59 +335,64 @@ export function ARMeasureModal({
               </motion.div>
             )}
 
-            {state === 'launching' && (
-              <motion.div key="launching" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center">
-                <motion.div
-                  animate={{ rotate: [0, 360], scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="mb-6 mx-auto w-24 h-24 bg-gradient-to-br from-brand to-brand/70 rounded-3xl flex items-center justify-center"
-                >
-                  <Camera className="w-12 h-12 text-white" />
-                </motion.div>
-                <h3 className="text-xl font-semibold mb-2">Launching AR Camera...</h3>
-                <p className="text-text/70">Preparing measurement tools</p>
-              </motion.div>
-            )}
-
-            {state === 'measuring' && (
-              <motion.div key="measuring" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center">
-                {/* AR Viewfinder Simulation */}
-                <div className="mb-6 relative mx-auto w-72 h-72">
-                  <div className="absolute inset-0 bg-gradient-to-br from-brand/10 to-transparent rounded-3xl overflow-hidden">
-                    {/* Grid */}
-                    <div className="absolute inset-0" style={{
-                      backgroundImage: 'linear-gradient(rgba(255,202,44,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,202,44,0.1) 1px, transparent 1px)',
-                      backgroundSize: '30px 30px'
-                    }} />
-                    {/* Scan line */}
-                    <motion.div className="absolute left-0 right-0 h-0.5 bg-brand shadow-lg shadow-brand/50"
-                      animate={{ top: ['0%', '100%', '0%'] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    />
-                    {/* Corners (FIX: 3px borders via arbitrary values) */}
-                    <div className="absolute top-4 left-4 w-12 h-12 border-l-[3px] border-t-[3px] border-brand rounded-tl-lg" />
-                    <div className="absolute top-4 right-4 w-12 h-12 border-r-[3px] border-t-[3px] border-brand rounded-tr-lg" />
-                    <div className="absolute bottom-4 left-4 w-12 h-12 border-l-[3px] border-b-[3px] border-brand rounded-bl-lg" />
-                    <div className="absolute bottom-4 right-4 w-12 h-12 border-r-[3px] border-b-[3px] border-brand rounded-br-lg" />
-                    {/* Reticle */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-8 h-8 border-2 border-brand rounded-full"
-                      />
-                    </div>
-                    {/* Points */}
-                    <motion.div className="absolute top-1/4 left-1/4 w-3 h-3 bg-brand rounded-full" animate={{ scale: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity }} />
-                    <motion.div className="absolute top-3/4 right-1/4 w-3 h-3 bg-brand rounded-full" animate={{ scale: [0, 1, 0] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }} />
+            {(state === 'calibration' || state === 'measuring') && (
+              <motion.div key="camera" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center">
+                {/* Camera Feed */}
+                <div className="relative mb-4 rounded-2xl overflow-hidden bg-black">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-64 object-cover"
+                  />
+                  <canvas
+                    ref={canvasRef}
+                    width={640}
+                    height={480}
+                    onClick={handleCanvasClick}
+                    className="absolute inset-0 w-full h-full cursor-crosshair"
+                  />
+                  
+                  {/* Crosshair */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                    <Crosshair className="w-8 h-8 text-brand animate-pulse" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Scanning Your Space...</h3>
-                <p className="text-text/70">Move your device slowly to capture all corners</p>
-                <div className="mt-4 flex justify-center items-center gap-2">
-                  <Loader2 className="w-4 h-4 text-brand animate-spin" />
-                  <span className="text-sm text-brand font-medium">Detecting walls...</span>
-                </div>
+
+                {/* Instructions */}
+                {state === 'calibration' && (
+                  <div className="bg-brand/10 rounded-2xl p-4">
+                    <h3 className="text-lg font-semibold mb-2">📏 Calibration</h3>
+                    <p className="text-sm text-text/70">
+                      {!measurementPoints.widthStart 
+                        ? "Place a credit card on the wall and tap its LEFT corner"
+                        : "Now tap the RIGHT corner of the credit card"}
+                    </p>
+                  </div>
+                )}
+
+                {state === 'measuring' && currentStep === 'width' && (
+                  <div className="bg-green-50 rounded-2xl p-4">
+                    <h3 className="text-lg font-semibold mb-2 text-green-700">📐 Measure Width</h3>
+                    <p className="text-sm text-text/70">
+                      {!measurementPoints.widthStart 
+                        ? "Tap the LEFT edge of the wall"
+                        : "Now tap the RIGHT edge of the wall"}
+                    </p>
+                  </div>
+                )}
+
+                {state === 'measuring' && currentStep === 'height' && (
+                  <div className="bg-blue-50 rounded-2xl p-4">
+                    <h3 className="text-lg font-semibold mb-2 text-blue-700">📏 Measure Height</h3>
+                    <p className="text-sm text-text/70">
+                      {!measurementPoints.heightStart 
+                        ? "Tap the BOTTOM of the wall"
+                        : "Now tap the TOP of the wall"}
+                    </p>
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -250,7 +419,7 @@ export function ARMeasureModal({
                     <div>
                       <p className="text-sm text-text/60 mb-1">Total Area</p>
                       <p className="text-2xl font-bold text-brand">
-                        {measurements.areaSqM} m² {/* FIX: unit to sq m */}
+                        {measurements.areaSqM} m²
                       </p>
                     </div>
                     <div>
@@ -259,12 +428,6 @@ export function ARMeasureModal({
                         {measurements.dimensions}
                       </p>
                     </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t">
-                    <p className="text-sm text-text/60">Room Type</p>
-                    <p className="text-lg font-medium capitalize">
-                      {measurements.roomType.replace('_', ' ')}
-                    </p>
                   </div>
                 </div>
                 <p className="text-sm text-text/70">Redirecting to quote calculator...</p>
@@ -282,7 +445,7 @@ export function ARMeasureModal({
                   <button onClick={retry} className="flex-1 bg-brand hover:bg-brand/90 text-black font-semibold py-3 rounded-2xl transition-all">
                     Try Again
                   </button>
-                  <button onClick={onClose} className="flex-1 bg-gray-100 hover:bg-gray-200 text-text font-semibold py-3 rounded-2xl transition-all">
+                  <button onClick={handleClose} className="flex-1 bg-gray-100 hover:bg-gray-200 text-text font-semibold py-3 rounded-2xl transition-all">
                     Cancel
                   </button>
                 </div>
