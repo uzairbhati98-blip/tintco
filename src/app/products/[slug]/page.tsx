@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link' // Added this import
 import products from '@/data/products.json'
 import type { Product } from '@/lib/types'
 import { ProductGallery } from '@/components/product-gallery'
@@ -8,9 +7,9 @@ import { ARMeasureButton } from '@/components/ar-measure-button'
 import { ColorPicker } from '@/components/color-picker'
 import { Star, Check, Truck, Shield, Palette } from 'lucide-react'
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const { slug } = params
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  
   const product = (products as any[]).find(
     (p) => p.slug === slug
   ) as Product | undefined
@@ -51,13 +50,13 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
         <div>
           <div className="flex items-center gap-2 text-sm text-text/60 mb-4">
-            <Link href="/categories" className="hover:text-brand">
+            <a href="/categories" className="hover:text-brand">
               Categories
-            </Link>
+            </a>
             <span>/</span>
-            <Link href={`/categories/${product.categorySlug}`} className="hover:text-brand">
+            <a href={`/categories/${product.categorySlug}`} className="hover:text-brand">
               {product.categorySlug}
-            </Link>
+            </a>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold mb-3">
@@ -78,8 +77,6 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               ))}
             </div>
             <span className="text-sm font-medium">{reviews.average}</span>
-            
-            {/* The error was here: missing opening <a tag */}
             <a
               href="#reviews"
               className="text-sm text-text/60 hover:text-brand transition-colors"
@@ -101,11 +98,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
           {isPaintProduct && (
             <div className="mb-8 p-6 bg-white rounded-2xl border-2 border-gray-100">
-              <ColorPicker 
-                onColorChange={(color) => {
-                  console.log('Selected color:', color)
-                }}
-              />
+              <ColorPicker />
             </div>
           )}
 
