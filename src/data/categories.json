@@ -1,0 +1,20 @@
+[
+  {
+    "id": "painting",
+    "name": "Wall Painting",
+    "slug": "painting",
+    "heroImage": "/images/category-painting.jpg"
+  },
+  {
+    "id": "panels",
+    "name": "Decorative Panels",
+    "slug": "decorative-panels",
+    "heroImage": "/images/category-panels.jpg"
+  },
+  {
+    "id": "flooring",
+    "name": "Epoxy Flooring",
+    "slug": "epoxy-flooring",
+    "heroImage": "/images/category-flooring.jpg"
+  }
+]

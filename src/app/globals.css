@@ -1,0 +1,265 @@
+@import "tailwindcss";
+
+/* ===================================
+   TINTCO DESIGN SYSTEM
+   =================================== */
+
+:root {
+  /* Brand Colors */
+  --color-brand: #FFCA2C;
+  --color-text: #1E1E1E;
+  --color-bg: #FFFFFF;
+  
+  /* Border System */
+  --border-color: rgba(30, 30, 30, 0.1);
+  
+  /* Surface System */
+  --surface-bg: #ffffff;
+  --surface-radius: 1rem;
+  --surface-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* ===================================
+   GLOBAL STYLES
+   =================================== */
+
+html, body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+/* Page container */
+.page-container {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===================================
+   FOCUS & ACCESSIBILITY
+   =================================== */
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* ===================================
+   TINTCO SURFACE SYSTEM
+   =================================== */
+
+.surface {
+  background-color: var(--surface-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--surface-radius);
+  box-shadow: var(--surface-shadow);
+  transition: all 0.25s ease;
+}
+
+.surface-hover {
+  transition: all 0.3s ease;
+}
+
+.surface-hover:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 202, 44, 0.3);
+  transform: translateY(-3px);
+}
+
+.border-brand {
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+}
+
+.border-brand-hover:hover {
+  border-color: rgba(255, 202, 44, 0.5);
+}
+
+/* ===================================
+   SHADOWS
+   =================================== */
+
+.shadow-soft {
+  box-shadow: 0 10px 40px -15px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-subtle {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-xl {
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.15);
+}
+
+/* ===================================
+   INTERACTIVE EFFECTS
+   =================================== */
+
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px) translateZ(0);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.15);
+}
+
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+
+a, button {
+  transition: all 0.25s ease-in-out;
+}
+
+/* ===================================
+   ANIMATIONS
+   =================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-20px) rotate(1deg); }
+  66% { transform: translateY(10px) rotate(-1deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Animation classes */
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.animate-pulseSubtle {
+  animation: pulseSubtle 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-bounce {
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Animation delays */
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+
+/* ===================================
+   UTILITIES
+   =================================== */
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-brand) 0%, #e6b622 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===================================
+   CUSTOM SCROLLBAR
+   =================================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e6b622;
+}
+
+/* ===================================
+   RESPONSIVE OPTIMIZATIONS
+   =================================== */
+
+/* Particle background optimization for mobile */
+@media (max-width: 768px) {
+  #tsparticles {
+    opacity: 0.15 !important;
+  }
+}
+
+/* Responsive text sizing */
+@media (max-width: 640px) {
+  h1 {
+    font-size: clamp(1.875rem, 5vw, 2.25rem);
+  }
+  
+  h2 {
+    font-size: clamp(1.5rem, 4vw, 1.875rem);
+  }
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-brand: #FFB700;
+    --color-text: #000000;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

@@ -1,0 +1,73 @@
+[
+{
+"id": "p1",
+"slug": "classic-matte-paint",
+"categorySlug": "painting",
+"name": "Classic Matte Paint",
+"description": "Smooth, low-sheen finish ideal for living rooms.",
+"images": [
+"https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1505691723518-36a5ac3b2d42?q=80&w=1600&auto=format&fit=crop"
+],
+"price": 1.8,
+"unit": "sqft",
+"attributes": {"finish": "matte", "washable": "medium"},
+"arMeasureEnabled": true
+},
+{
+"id": "p2",
+"slug": "washable-eggshell-paint",
+"categorySlug": "painting",
+"name": "Washable Eggshell Paint",
+"description": "Kid‑friendly durable paint for high‑traffic areas.",
+"images": [
+"https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600&auto=format&fit=crop"
+],
+"price": 2.2,
+"unit": "sqft",
+"attributes": {"finish": "eggshell", "washable": "high"},
+"arMeasureEnabled": true
+},
+{
+"id": "p3",
+"slug": "accent-wall-panel-oak",
+"categorySlug": "decorative-panels",
+"name": "Accent Wall Panel — Oak",
+"description": "Warm oak slats for modern interiors.",
+"images": [
+"https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=1600&auto=format&fit=crop"
+],
+"price": 120,
+"unit": "unit",
+"attributes": {"material": "oak", "panelSize": "2.4m x 0.6m"},
+"arMeasureEnabled": true
+},
+{
+"id": "p4",
+"slug": "accent-wall-panel-walnut",
+"categorySlug": "decorative-panels",
+"name": "Accent Wall Panel — Walnut",
+"description": "Rich walnut tone with acoustic felt backing.",
+"images": [
+"https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1600&auto=format&fit=crop"
+],
+"price": 150,
+"unit": "unit",
+"attributes": {"material": "walnut", "panelSize": "2.4m x 0.6m"},
+"arMeasureEnabled": true
+},
+{
+"id": "p5",
+"slug": "epoxy-floor-standard",
+"categorySlug": "epoxy-flooring",
+"name": "Epoxy Floor — Standard",
+"description": "Durable, easy‑clean epoxy for garages & basements.",
+"images": [
+"https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1600&auto=format&fit=crop"
+],
+"price": 3.5,
+"unit": "sqft",
+"attributes": {"thickness": "2mm", "finish": "satin"},
+"arMeasureEnabled": false
+}
+]
