@@ -1,61 +1,69 @@
-import { notFound } from 'next/navigation';
-import products from '@/data/products.json';
-import type { Product } from '@/lib/types';
-import { ProductGallery } from '@/components/product-gallery';
-import { ClientProductActions } from './client-product-actions';
-import { ARMeasureButton } from '@/components/ar-measure-button';
-import { Star, Check, Truck, Shield, Palette } from 'lucide-react';
+import { notFound } from 'next/navigation'
+import Link from 'next/link' // Added this import
+import products from '@/data/products.json'
+import type { Product } from '@/lib/types'
+import { ProductGallery } from '@/components/product-gallery'
+import { ClientProductActions } from './client-product-actions'
+import { ARMeasureButton } from '@/components/ar-measure-button'
+import { ColorPicker } from '@/components/color-picker'
+import { Star, Check, Truck, Shield, Palette } from 'lucide-react'
 
 export default function ProductPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+  const { slug } = params
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const product = (products as any[]).find(
     (p) => p.slug === slug
-  ) as Product | undefined;
+  ) as Product | undefined
 
-  if (!product) return notFound();
+  if (!product) return notFound()
 
   const reviews = {
     average: 4.8,
     count: 127,
-  };
+  }
+
+  const isPaintProduct = product.categorySlug === 'painting'
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <div className="grid lg:grid-cols-2 gap-12">
-        {/* Left: Image Gallery */}
         <div>
           <ProductGallery
             images={product.images?.length ? product.images : ['/placeholder.jpg']}
             name={product.name}
           />
 
-          {/* Trust badges */}
           <div className="mt-6 grid grid-cols-3 gap-4 text-sm text-text/70">
             <div className="flex items-center gap-2">
-              <Truck className="w-4 h-4 text-brand" /> <span>Free Delivery</span>
+              <Truck className="w-4 h-4 text-brand" />
+              <span>Free Delivery</span>
             </div>
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-brand" /> <span>2 Year Warranty</span>
+              <Shield className="w-4 h-4 text-brand" />
+              <span>2 Year Warranty</span>
             </div>
             <div className="flex items-center gap-2">
-              <Palette className="w-4 h-4 text-brand" /> <span>Color Match</span>
+              <Palette className="w-4 h-4 text-brand" />
+              <span>Color Match</span>
             </div>
           </div>
         </div>
 
-        {/* Right: Product Info */}
         <div>
           <div className="flex items-center gap-2 text-sm text-text/60 mb-4">
-            <a href="/categories" className="hover:text-brand">Categories</a>
+            <Link href="/categories" className="hover:text-brand">
+              Categories
+            </Link>
             <span>/</span>
-            <a href={`/categories/${product.categorySlug}`} className="hover:text-brand">
+            <Link href={`/categories/${product.categorySlug}`} className="hover:text-brand">
               {product.categorySlug}
-            </a>
+            </Link>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">{product.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-3">
+            {product.name}
+          </h1>
 
-          {/* Reviews */}
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
@@ -70,15 +78,19 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               ))}
             </div>
             <span className="text-sm font-medium">{reviews.average}</span>
+            
+            {/* The error was here: missing opening <a tag */}
             <a
               href="#reviews"
               className="text-sm text-text/60 hover:text-brand transition-colors"
             >
-              ({reviews.count} reviews)
+              {reviews.count} reviews
             </a>
           </div>
 
-          <p className="text-text/70 mb-6 leading-relaxed">{product.description}</p>
+          <p className="text-text/70 mb-6 leading-relaxed">
+            {product.description}
+          </p>
 
           <div className="mb-6">
             <div className="flex items-baseline gap-2">
@@ -86,6 +98,16 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               <span className="text-lg text-text/60">/ {product.unit}</span>
             </div>
           </div>
+
+          {isPaintProduct && (
+            <div className="mb-8 p-6 bg-white rounded-2xl border-2 border-gray-100">
+              <ColorPicker 
+                onColorChange={(color) => {
+                  console.log('Selected color:', color)
+                }}
+              />
+            </div>
+          )}
 
           <div className="space-y-3 mb-8">
             <ClientProductActions product={product} />
@@ -111,5 +133,5 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
