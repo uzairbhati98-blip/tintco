@@ -1,9 +1,9 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, CheckCircle2, Loader2, AlertCircle, X, Ruler } from 'lucide-react'
+import { Camera, CheckCircle2, Loader2, AlertCircle, X, Ruler, CreditCard } from 'lucide-react'
 
-type ARState = 'idle' | 'camera' | 'measuring' | 'success' | 'error' | 'manual'
+type ARState = 'idle' | 'camera' | 'calibration' | 'measuring' | 'success' | 'error' | 'manual'
 
 interface Point {
   x: number
@@ -36,8 +36,10 @@ export function ARMeasureModal({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
   
-  // Measurement points
-  const [points, setPoints] = useState<Point[]>([])
+  // Measurement state
+  const [calibrationPoints, setCalibrationPoints] = useState<Point[]>([])
+  const [measurementPoints, setMeasurementPoints] = useState<Point[]>([])
+  const [referencePixels, setReferencePixels] = useState(0)
   const [step, setStep] = useState<'width' | 'height'>('width')
   
   // Manual input
@@ -47,14 +49,26 @@ export function ARMeasureModal({
   useEffect(() => {
     if (isOpen) {
       setState('idle')
-      setPoints([])
-      setStep('width')
-      setManualWidth('')
-      setManualHeight('')
+      resetMeasurement()
     } else {
       stopCamera()
     }
   }, [isOpen])
+
+  const resetMeasurement = () => {
+    setCalibrationPoints([])
+    setMeasurementPoints([])
+    setReferencePixels(0)
+    setStep('width')
+    setManualWidth('')
+    setManualHeight('')
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d')
+      if (ctx) {
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+      }
+    }
+  }
 
   const stopCamera = () => {
     if (streamRef.current) {
@@ -70,8 +84,8 @@ export function ARMeasureModal({
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
           facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
         }
       })
       
@@ -79,8 +93,18 @@ export function ARMeasureModal({
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream
-        await videoRef.current.play()
-        setState('measuring')
+        
+        // Wait for video to load metadata
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current && canvasRef.current) {
+            // Set canvas size to match video
+            canvasRef.current.width = videoRef.current.videoWidth
+            canvasRef.current.height = videoRef.current.videoHeight
+            
+            videoRef.current.play()
+            setState('calibration')
+          }
+        }
       }
     } catch (error) {
       console.error('Camera error:', error)
@@ -90,35 +114,62 @@ export function ARMeasureModal({
   }
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (state !== 'measuring') return
-
     const canvas = canvasRef.current
     if (!canvas) return
 
+    // Get click coordinates relative to canvas
     const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    
+    const x = (e.clientX - rect.left) * scaleX
+    const y = (e.clientY - rect.top) * scaleY
 
     const newPoint = { x, y }
-    const newPoints = [...points, newPoint]
-    setPoints(newPoints)
+
+    if (state === 'calibration') {
+      handleCalibrationClick(newPoint)
+    } else if (state === 'measuring') {
+      handleMeasurementClick(newPoint)
+    }
+  }
+
+  const handleCalibrationClick = (point: Point) => {
+    const newPoints = [...calibrationPoints, point]
+    setCalibrationPoints(newPoints)
 
     // Draw point
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      ctx.fillStyle = step === 'width' ? '#10b981' : '#3b82f6'
-      ctx.beginPath()
-      ctx.arc(x, y, 8, 0, 2 * Math.PI)
-      ctx.fill()
+    drawPoint(point, '#FFCA2C', 12)
+
+    if (newPoints.length === 2) {
+      // Calculate reference distance (credit card width = 85.6mm = 0.0856m)
+      const distance = calculateDistance(newPoints[0], newPoints[1])
+      setReferencePixels(distance)
       
-      ctx.strokeStyle = step === 'width' ? '#10b981' : '#3b82f6'
-      ctx.lineWidth = 3
-      ctx.beginPath()
-      ctx.arc(x, y, 15, 0, 2 * Math.PI)
-      ctx.stroke()
+      // Move to measuring
+      setTimeout(() => {
+        setState('measuring')
+        setCalibrationPoints([])
+        clearCanvas()
+      }, 500)
+    }
+  }
+
+  const handleMeasurementClick = (point: Point) => {
+    const newPoints = [...measurementPoints, point]
+    setMeasurementPoints(newPoints)
+
+    // Draw point with color based on step
+    const color = step === 'width' ? '#10b981' : '#3b82f6'
+    drawPoint(point, color, 10)
+
+    // Draw line if we have 2 points for current measurement
+    if (newPoints.length === 2 || newPoints.length === 4) {
+      const startIdx = newPoints.length === 2 ? 0 : 2
+      drawLine(newPoints[startIdx], newPoints[startIdx + 1], color)
     }
 
-    // Check progress
+    // Progress logic
     if (step === 'width' && newPoints.length === 2) {
       setStep('height')
     } else if (step === 'height' && newPoints.length === 4) {
@@ -126,41 +177,90 @@ export function ARMeasureModal({
     }
   }
 
+  const drawPoint = (point: Point, color: string, size: number) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Inner circle
+    ctx.fillStyle = color
+    ctx.beginPath()
+    ctx.arc(point.x, point.y, size, 0, 2 * Math.PI)
+    ctx.fill()
+
+    // Outer ring
+    ctx.strokeStyle = color
+    ctx.lineWidth = 4
+    ctx.beginPath()
+    ctx.arc(point.x, point.y, size + 8, 0, 2 * Math.PI)
+    ctx.stroke()
+  }
+
+  const drawLine = (p1: Point, p2: Point, color: string) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    ctx.strokeStyle = color
+    ctx.lineWidth = 3
+    ctx.setLineDash([10, 5])
+    ctx.beginPath()
+    ctx.moveTo(p1.x, p1.y)
+    ctx.lineTo(p2.x, p2.y)
+    ctx.stroke()
+    ctx.setLineDash([])
+  }
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+  }
+
+  const calculateDistance = (p1: Point, p2: Point): number => {
+    const dx = p2.x - p1.x
+    const dy = p2.y - p1.y
+    return Math.sqrt(dx * dx + dy * dy)
+  }
+
   const calculateMeasurement = (points: Point[]) => {
+    if (referencePixels === 0) {
+      setState('error')
+      setErrorMessage('Calibration error. Please try again.')
+      return
+    }
+
     stopCamera()
-    
-    // Calculate distances in pixels
-    const widthPx = Math.sqrt(
-      Math.pow(points[1].x - points[0].x, 2) + 
-      Math.pow(points[1].y - points[0].y, 2)
-    )
-    
-    const heightPx = Math.sqrt(
-      Math.pow(points[3].x - points[2].x, 2) + 
-      Math.pow(points[3].y - points[2].y, 2)
-    )
-    
-    // Estimate: assume user is ~2m from wall
-    // Average room: 4m wide, 2.8m tall
-    // This is rough but gives reasonable estimates
-    const pixelToMeter = 0.01 // Calibration factor
-    
-    const widthM = parseFloat((widthPx * pixelToMeter).toFixed(1))
-    const heightM = parseFloat((heightPx * pixelToMeter).toFixed(1))
+
+    // Calculate pixel distances
+    const widthPx = calculateDistance(points[0], points[1])
+    const heightPx = calculateDistance(points[2], points[3])
+
+    // Convert to meters using credit card reference (85.6mm = 0.0856m)
+    const CREDIT_CARD_WIDTH_M = 0.0856
+    const widthM = (widthPx / referencePixels) * CREDIT_CARD_WIDTH_M
+    const heightM = (heightPx / referencePixels) * CREDIT_CARD_WIDTH_M
+
     const areaSqM = parseFloat((widthM * heightM).toFixed(2))
-    
+
     setMeasurements({
       areaSqM,
-      dimensions: `${widthM}m × ${heightM}m`,
+      dimensions: `${widthM.toFixed(1)}m × ${heightM.toFixed(1)}m`,
       roomType: 'living_room'
     })
-    
+
     setState('success')
-    
+
     setTimeout(() => {
       onSuccess({
         areaSqM,
-        dimensions: `${widthM}m × ${heightM}m`,
+        dimensions: `${widthM.toFixed(1)}m × ${heightM.toFixed(1)}m`,
         roomType: 'living_room'
       })
       onClose()
@@ -170,22 +270,22 @@ export function ARMeasureModal({
   const handleManualSubmit = () => {
     const width = parseFloat(manualWidth)
     const height = parseFloat(manualHeight)
-    
+
     if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
       setErrorMessage('Please enter valid dimensions')
       return
     }
-    
+
     const areaSqM = parseFloat((width * height).toFixed(2))
-    
+
     setMeasurements({
       areaSqM,
       dimensions: `${width}m × ${height}m`,
       roomType: 'living_room'
     })
-    
+
     setState('success')
-    
+
     setTimeout(() => {
       onSuccess({
         areaSqM,
@@ -200,15 +300,126 @@ export function ARMeasureModal({
     stopCamera()
     setState('manual')
     setErrorMessage('')
+    resetMeasurement()
+  }
+
+  const retry = () => {
+    resetMeasurement()
+    startCamera()
   }
 
   if (!isOpen) return null
 
+  // Fullscreen camera view
+  if (state === 'camera' || state === 'calibration' || state === 'measuring') {
+    return (
+      <div className="fixed inset-0 z-50 bg-black">
+        {/* Video */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+
+        {/* Canvas overlay */}
+        <canvas
+          ref={canvasRef}
+          onClick={handleCanvasClick}
+          className="absolute inset-0 w-full h-full cursor-crosshair"
+        />
+
+        {/* Instructions overlay */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top bar */}
+          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-6">
+            <button
+              onClick={() => {
+                stopCamera()
+                setState('idle')
+                resetMeasurement()
+              }}
+              className="pointer-events-auto p-2 rounded-full bg-white/10 backdrop-blur hover:bg-white/20 transition-colors"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+          </div>
+
+          {/* Bottom instructions */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-6">
+            {state === 'calibration' && (
+              <div className="text-white space-y-3">
+                <div className="flex items-center gap-3 mb-4">
+                  <CreditCard className="w-8 h-8 text-brand" />
+                  <div>
+                    <h3 className="text-xl font-bold">Step 1: Calibration</h3>
+                    <p className="text-sm text-white/70">Place a credit card on the wall</p>
+                  </div>
+                </div>
+                <div className="bg-brand/20 backdrop-blur rounded-2xl p-4">
+                  <p className="font-medium">
+                    {calibrationPoints.length === 0 
+                      ? '📍 Tap the LEFT edge of credit card'
+                      : '📍 Tap the RIGHT edge of credit card'}
+                  </p>
+                  <p className="text-xs text-white/60 mt-2">
+                    Points: {calibrationPoints.length}/2
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {state === 'measuring' && (
+              <div className="text-white space-y-3">
+                <div className="flex items-center gap-3 mb-4">
+                  <Ruler className="w-8 h-8 text-brand" />
+                  <div>
+                    <h3 className="text-xl font-bold">
+                      Step {step === 'width' ? '2' : '3'}: Measure {step === 'width' ? 'Width' : 'Height'}
+                    </h3>
+                    <p className="text-sm text-white/70">Tap the corners</p>
+                  </div>
+                </div>
+                <div className={`backdrop-blur rounded-2xl p-4 ${
+                  step === 'width' ? 'bg-green-500/20' : 'bg-blue-500/20'
+                }`}>
+                  <p className="font-medium">
+                    {step === 'width' 
+                      ? measurementPoints.length === 0
+                        ? '📍 Tap LEFT edge of wall'
+                        : '📍 Tap RIGHT edge of wall'
+                      : measurementPoints.length === 2
+                        ? '📍 Tap BOTTOM of wall'
+                        : '📍 Tap TOP of wall'
+                    }
+                  </p>
+                  <p className="text-xs text-white/60 mt-2">
+                    Points: {measurementPoints.length}/4
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Switch to manual button */}
+            <button
+              onClick={switchToManual}
+              className="pointer-events-auto mt-4 w-full bg-white/10 backdrop-blur hover:bg-white/20 text-white font-medium py-3 rounded-2xl transition-all"
+            >
+              Switch to Manual Entry
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Regular modal for other states
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <motion.div
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
@@ -240,15 +451,15 @@ export function ARMeasureModal({
                 <p className="text-text/70 mb-6">
                   For <span className="font-semibold">{productName}</span>
                 </p>
-                
+
                 <div className="space-y-3">
                   <button
                     onClick={startCamera}
                     className="w-full bg-brand hover:bg-brand/90 text-black font-semibold py-4 rounded-2xl transition-all"
                   >
-                    📱 Use Camera
+                    📱 Use Camera (Accurate)
                   </button>
-                  
+
                   <button
                     onClick={switchToManual}
                     className="w-full bg-gray-100 hover:bg-gray-200 text-text font-semibold py-4 rounded-2xl transition-all"
@@ -256,55 +467,10 @@ export function ARMeasureModal({
                     📏 Enter Manually
                   </button>
                 </div>
-              </motion.div>
-            )}
 
-            {(state === 'camera' || state === 'measuring') && (
-              <motion.div key="camera" className="text-center">
-                <div className="relative mb-4 rounded-2xl overflow-hidden bg-black">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-64 object-cover"
-                  />
-                  <canvas
-                    ref={canvasRef}
-                    width={640}
-                    height={480}
-                    onClick={handleCanvasClick}
-                    className="absolute inset-0 w-full h-full cursor-crosshair"
-                  />
-                </div>
-
-                {state === 'measuring' && (
-                  <div className={`rounded-2xl p-4 ${step === 'width' ? 'bg-green-50' : 'bg-blue-50'}`}>
-                    <h3 className="text-lg font-semibold mb-2">
-                      {step === 'width' ? '📐 Measure Width' : '📏 Measure Height'}
-                    </h3>
-                    <p className="text-sm text-text/70">
-                      {step === 'width' 
-                        ? points.length === 0 
-                          ? 'Tap LEFT edge of wall'
-                          : 'Tap RIGHT edge of wall'
-                        : points.length === 2
-                          ? 'Tap BOTTOM of wall'
-                          : 'Tap TOP of wall'
-                      }
-                    </p>
-                    <p className="text-xs text-text/50 mt-2">
-                      Points: {points.length}/4
-                    </p>
-                  </div>
-                )}
-
-                <button
-                  onClick={switchToManual}
-                  className="mt-4 text-sm text-text/60 hover:text-text"
-                >
-                  Switch to manual entry
-                </button>
+                <p className="mt-4 text-xs text-text/50">
+                  Camera method uses a credit card for accurate calibration
+                </p>
               </motion.div>
             )}
 
@@ -357,6 +523,13 @@ export function ARMeasureModal({
                   >
                     Calculate Area
                   </button>
+
+                  <button
+                    onClick={startCamera}
+                    className="w-full text-text/60 hover:text-text text-sm"
+                  >
+                    ← Back to Camera
+                  </button>
                 </div>
               </motion.div>
             )}
@@ -395,14 +568,14 @@ export function ARMeasureModal({
                 <h3 className="text-xl font-semibold mb-2">Camera Access Needed</h3>
                 <p className="text-text/70 mb-6">{errorMessage}</p>
                 <div className="space-y-3">
-                  <button 
+                  <button
                     onClick={switchToManual}
                     className="w-full bg-brand hover:bg-brand/90 text-black font-semibold py-3 rounded-2xl transition-all"
                   >
                     Enter Manually Instead
                   </button>
-                  <button 
-                    onClick={startCamera}
+                  <button
+                    onClick={retry}
                     className="w-full bg-gray-100 hover:bg-gray-200 text-text font-semibold py-3 rounded-2xl transition-all"
                   >
                     Try Camera Again
