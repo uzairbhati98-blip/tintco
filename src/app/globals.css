@@ -248,7 +248,6 @@ a, button {
 /* ===================================
    ACCESSIBILITY
    =================================== */
-
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   :root {

@@ -2,52 +2,65 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { toast } from "sonner"
 import { useQuote } from "@/lib/store/quote"
-import type { Product, ARMeasurement } from "@/lib/types"
+import type { Product } from "@/lib/types"
+import { ARMeasureModal } from "@/components/ar-measure-modal"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 type Props = {
   product: Product
 }
 
-function simulateAR(): Promise<ARMeasurement> {
-  // deterministic mock for dev
-  return new Promise((res) =>
-    setTimeout(
-      () => res({ widthM: 4, heightM: 2.8, areaSqM: 11.2, count: 2, notes: "Mock AR" }),
-      1000
-    )
-  )
-}
-
 export function ARMeasureButton({ product }: Props) {
-  const [loading, setLoading] = useState(false)
-  const ingest = useQuote((s) => s.ingestARMeasurement)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const ingestARMeasurement = useQuote((s) => s.ingestARMeasurement)
+  const setFromProduct = useQuote((s) => s.setFromProduct)
+  const router = useRouter()
+
+  const handleSuccess = (data: { areaSqM: number; dimensions: string; roomType: string }) => {
+    // Set the product in the quote store
+    setFromProduct(product)
+    
+    // Ingest the AR measurement
+    ingestARMeasurement({
+      widthM: parseFloat(data.dimensions.split('×')[0]), // Extract width from "4m × 3m"
+      heightM: parseFloat(data.dimensions.split('×')[1]), // Extract height
+      areaSqM: data.areaSqM,
+      count: 1,
+      notes: `AR measurement - ${data.roomType.replace('_', ' ')}`
+    })
+    
+    // Show success toast
+    toast.success("AR measurement captured", {
+      description: `${data.areaSqM} m² measured successfully`
+    })
+    
+    // Close modal
+    setIsModalOpen(false)
+    
+    // Redirect to quote page
+    router.push("/quote")
+  }
 
   return (
-    <motion.button
-      whileTap={{ scale: 0.96 }}
-      whileHover={{ scale: 1.05 }}
-      transition={{ type: "spring", stiffness: 300 }}
-      disabled={loading}
-      onClick={async () => {
-        try {
-          setLoading(true)
-          const m = await simulateAR()
-          ingest(m)
-          toast.success("AR measurement captured", {
-            description: `~${m.areaSqM.toFixed(2)} m² added to quote`,
-          })
-          location.href = "/quote"
-        } catch (e) {
-          toast.error("AR failed", { description: "Please try again." })
-        } finally {
-          setLoading(false)
-        }
-      }}
-      className="px-6 py-3 rounded-2xl bg-brand/90 hover:bg-brand text-black font-medium shadow-sm focus:ring-2 focus:ring-brand focus:ring-offset-2"
-    >
-      {loading ? "Measuring..." : "Measure with AR"}
-    </motion.button>
+    <>
+      <motion.button
+        whileTap={{ scale: 0.96 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 300 }}
+        onClick={() => setIsModalOpen(true)}
+        className="px-6 py-3 rounded-2xl bg-brand/90 hover:bg-brand text-black font-medium shadow-sm focus:ring-2 focus:ring-brand focus:ring-offset-2"
+      >
+        Measure with AR
+      </motion.button>
+
+      <ARMeasureModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleSuccess}
+        productName={product.name}
+      />
+    </>
   )
 }
