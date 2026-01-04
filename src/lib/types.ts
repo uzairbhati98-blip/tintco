@@ -17,7 +17,7 @@ export type Product = {
   unit: 'sqft' | 'unit';
   attributes?: Record<string, string | number>;
   arMeasureEnabled: boolean;
-  colorPickerEnabled?: boolean; // ✅ NEW
+  colorPickerEnabled?: boolean;
 }
 
 export type CartItem = {
@@ -48,7 +48,6 @@ export type QuoteRequest = {
   customerEmail?: string;
 }
 
-// ✅ NEW COLOR TYPES
 export interface PaintColor {
   id: string;
   name: string;
@@ -61,4 +60,20 @@ export interface SelectedColor {
   name: string;
   hex: string;
   rgb: { r: number; g: number; b: number };
+}
+
+// NEW: Finish types
+export type FinishType = 'gloss' | 'semi-gloss' | 'matte' | 'marble' | 'epoxy' | 'microcement'
+
+export interface PaintFinish {
+  id: FinishType
+  name: string
+  icon: string
+  description: string
+  popular?: boolean
+}
+
+export interface PaintCustomization {
+  color: SelectedColor | null
+  finish: FinishType | null
 }

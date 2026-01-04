@@ -4,7 +4,7 @@ import type { Product } from '@/lib/types'
 import { ProductGallery } from '@/components/product-gallery'
 import { ClientProductActions } from './client-product-actions'
 import { ARMeasureButton } from '@/components/ar-measure-button'
-import { ColorPicker } from '@/components/color-picker'
+import { PaintCustomizer } from '@/components/paint-customizer'
 import { Star, Check, Truck, Shield, Palette } from 'lucide-react'
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -97,8 +97,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
 
           {isPaintProduct && (
-            <div className="mb-8 p-6 bg-white rounded-2xl border-2 border-gray-100">
-              <ColorPicker />
+            <div className="mb-8">
+              <PaintCustomizer 
+                onCustomizationChange={(customization) => {
+                  console.log('Paint customization:', customization)
+                }}
+              />
             </div>
           )}
 
