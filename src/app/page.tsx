@@ -71,13 +71,13 @@ export default function Home() {
           {[
             {
               title: 'Wall Painting',
-              href: '/categories/Wall painting',
+              href: '/categories/wall-painting',
               img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600&auto=format&fit=crop',
               description: 'Premium paints with perfect finish'
             },
             {
               title: 'Wall Coverings',
-              href: '/categories/Wall-coverings',
+              href: '/categories/wall-coverings',
               img: 'https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=1600&auto=format&fit=crop',
               description: '3D textures and modern designs'
             },
