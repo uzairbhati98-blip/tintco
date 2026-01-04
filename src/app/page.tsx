@@ -70,20 +70,20 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
-              title: 'Painting',
-              href: '/categories/painting',
+              title: 'Wall Painting',
+              href: '/categories/Wall painting',
               img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600&auto=format&fit=crop',
               description: 'Premium paints with perfect finish'
             },
             {
-              title: 'Decorative Panels',
-              href: '/categories/decorative-panels',
+              title: 'Wall Coverings',
+              href: '/categories/Wall-coverings',
               img: 'https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=1600&auto=format&fit=crop',
               description: '3D textures and modern designs'
             },
             {
-              title: 'Epoxy Flooring',
-              href: '/categories/epoxy-flooring',
+              title: 'Flooring',
+              href: '/categories/flooring',
               img: 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1600&auto=format&fit=crop',
               description: 'Durable and stylish floor coatings'
             }
