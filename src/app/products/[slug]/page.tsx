@@ -98,10 +98,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
           {isPaintProduct && (
             <div className="mb-8">
-              <PaintCustomizer 
-                onCustomizationChange={(customization) => {
-                  console.log('Paint customization:', customization)
-                }}
+              <PaintCustomizer
               />
             </div>
           )}
