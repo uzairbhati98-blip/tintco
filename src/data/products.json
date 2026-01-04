@@ -6,85 +6,85 @@
     "name": "Classic Paint",
     "description": "Smooth, ideal for living rooms.",
     "images": [
-      "/images/Wall-painting/classic-paint/#FFFFFF-1.png",
+      "/images/Wall-painting/classic-paint/FFFFFF-1.png",
       "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d42?q=80&w=1600&auto=format&fit=crop"
     ],
     "colorVariants": {
       "#FFFFFF": [
-        "/images/Wall-painting/classic-paint/#FFFFFF-1.png",
-        "/images/Wall-painting/classic-paint/#FFFFFF-2.png"
+        "/images/Wall-painting/classic-paint/FFFFFF-1.png",
+        "/images/Wall-painting/classic-paint/FFFFFF-2.png"
       ],
       "#FFCA2C": [
-        "/images/Wall-painting/classic-paint/#FFCA2C-1.png",
-        "/images/Wall-painting/classic-paint/#FFCA2C-2.png"
+        "/images/Wall-painting/classic-paint/FFCA2C-1.png",
+        "/images/Wall-painting/classic-paint/FFCA2C-2.png"
       ],
       "#FFB6C1": [
-        "/images/Wall-painting/classic-paint/#FFB6C1-1.png",
-        "/images/Wall-painting/classic-paint/#FFB6C1-2.png"
+        "/images/Wall-painting/classic-paint/FFB6C1-1.png",
+        "/images/Wall-painting/classic-paint/FFB6C1-2.png"
       ],
       "#F8F8F8": [
-        "/images/Wall-painting/classic-paint/#F8F8F8-1.png",
-        "/images/Wall-painting/classic-paint/#F8F8F8-2.png"
+        "/images/Wall-painting/classic-paint/F8F8F8-1.png",
+        "/images/Wall-painting/classic-paint/F8F8F8-2.png"
       ],
       "#F5F5DC": [
-        "/images/Wall-painting/classic-paint/#F5F5DC-1.png",
-        "/images/Wall-painting/classic-paint/#F5F5DC-2.png"
+        "/images/Wall-painting/classic-paint/F5F5DC-1.png",
+        "/images/Wall-painting/classic-paint/F5F5DC-2.png"
       ],
       "#F4A6A3": [
-        "/images/Wall-painting/classic-paint/#F4A6A3-1.png",
-        "/images/Wall-painting/classic-paint/#F4A6A3-2.png"
+        "/images/Wall-painting/classic-paint/F4A6A3-1.png",
+        "/images/Wall-painting/classic-paint/F4A6A3-2.png"
       ],
       "#E8DCC4": [
-        "/images/Wall-painting/classic-paint/#E8DCC4-1.png",
-        "/images/Wall-painting/classic-paint/#E8DCC4-2.png"
+        "/images/Wall-painting/classic-paint/E8DCC4-1.png",
+        "/images/Wall-painting/classic-paint/E8DCC4-2.png"
       ],
       "#E07A5F": [
-        "/images/Wall-painting/classic-paint/#E07A5F-1.png",
-        "/images/Wall-painting/classic-paint/#E07A5F-2.png"
+        "/images/Wall-painting/classic-paint/E07A5F-1.png",
+        "/images/Wall-painting/classic-paint/E07A5F-2.png"
       ],
       "#D9B99B": [
-        "/images/Wall-painting/classic-paint/#D9B99B-1.png",
-        "/images/Wall-painting/classic-paint/#D9B99B-2.png"
+        "/images/Wall-painting/classic-paint/D9B99B-1.png",
+        "/images/Wall-painting/classic-paint/D9B99B-2.png"
       ],
       "#D3D3D3": [
-        "/images/Wall-painting/classic-paint/#D3D3D3-1.png",
-        "/images/Wall-painting/classic-paint/#D3D3D3-2.png"
+        "/images/Wall-painting/classic-paint/D3D3D3-1.png",
+        "/images/Wall-painting/classic-paint/D3D3D3-2.png"
       ],
       "#CC5500": [
-        "/images/Wall-painting/classic-paint/#CC5500-1.png",
-        "/images/Wall-painting/classic-paint/#CC5500-2.png"
+        "/images/Wall-painting/classic-paint/CC5500-1.png",
+        "/images/Wall-painting/classic-paint/CC5500-2.png"
       ],
       "#C9B8A3": [
-        "/images/Wall-painting/classic-paint/#C9B8A3-1.png",
-        "/images/Wall-painting/classic-paint/#C9B8A3-2.png"
+        "/images/Wall-painting/classic-paint/C9B8A3-1.png",
+        "/images/Wall-painting/classic-paint/C9B8A3-2.png"
       ],
       "#B19CD9": [
-        "/images/Wall-painting/classic-paint/#B19CD9-1.png",
-        "/images/Wall-painting/classic-paint/#B19CD9-2.png"
+        "/images/Wall-painting/classic-paint/B19CD9-1.png",
+        "/images/Wall-painting/classic-paint/B19CD9-2.png"
       ],
       "#B0B0B0": [
-        "/images/Wall-painting/classic-paint/#B0B0B0-1.png",
-        "/images/Wall-painting/classic-paint/#B0B0B0-2.png"
+        "/images/Wall-painting/classic-paint/B0B0B0-1.png",
+        "/images/Wall-painting/classic-paint/B0B0B0-2.png"
       ],
       "#36454F": [
-        "/images/Wall-painting/classic-paint/#36454F-1.png",
-        "/images/Wall-painting/classic-paint/#36454F-2.png"
+        "/images/Wall-painting/classic-paint/36454F-1.png",
+        "/images/Wall-painting/classic-paint/36454F-2.png"
       ],
       "#98D8C8": [
-        "/images/Wall-painting/classic-paint/#98D8C8-1.png",
-        "/images/Wall-painting/classic-paint/#98D8C8-2.png"
+        "/images/Wall-painting/classic-paint/98D8C8-1.png",
+        "/images/Wall-painting/classic-paint/98D8C8-2.png"
       ],
       "#87CEEB": [
-        "/images/Wall-painting/classic-paint/#87CEEB-1.png",
-        "/images/Wall-painting/classic-paint/#87CEEB-2.png"
+        "/images/Wall-painting/classic-paint/87CEEB-1.png",
+        "/images/Wall-painting/classic-paint/87CEEB-2.png"
       ],
       "#9DC183": [
-        "/images/Wall-painting/classic-paint/#9DC183-1.png",
-        "/images/Wall-painting/classic-paint/#9DC183-2.png"
+        "/images/Wall-painting/classic-paint/9DC183-1.png",
+        "/images/Wall-painting/classic-paint/9DC183-2.png"
       ],
       "#8B4789": [
-        "/images/Wall-painting/classic-paint/#8B4789-1.png",
-        "/images/Wall-painting/classic-paint/#8B4789-2.png"
+        "/images/Wall-painting/classic-paint/8B4789-1.png",
+        "/images/Wall-painting/classic-paint/8B4789-2.png"
       ],
       "#4DB8A8": [
         "/images/Wall-painting/classic-paint/4DB8A8-1.png",
