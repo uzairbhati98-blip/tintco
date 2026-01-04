@@ -11,12 +11,30 @@
     ],
     "price": 1.8,
     "unit": "sqft",
-    "attributes": {"finish": "matte", "washable": "medium"},
+    "attributes": {"finish": "Customer Defined", "washable": "medium"},
     "arMeasureEnabled": true,
     "colorPickerEnabled": true
   },
+
   {
     "id": "p2",
+    "slug": "Micro-Cement",
+    "categorySlug": "painting",
+    "name": "Micro-Cement",
+    "description": "Granular, ideal for any area internal/external.",
+    "images": [
+      "https://images.unsplash.com/photo-1501045661006-fcebe0257c3f?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1505691723518-36a5ac3b2d42?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "price": 1.8,
+    "unit": "sqft",
+    "attributes": {"finish": "Textured", "washable": "medium"},
+    "arMeasureEnabled": true,
+    "colorPickerEnabled": true
+  },
+
+  {
+    "id": "p3",
     "slug": "washable-eggshell-paint",
     "categorySlug": "painting",
     "name": "Washable Eggshell Paint",
@@ -31,35 +49,50 @@
     "colorPickerEnabled": true
   },
   {
-    "id": "p3",
-    "slug": "accent-wall-panel-oak",
+    "id": "p4",
+    "slug": "Wood-Wall-panel",
     "categorySlug": "decorative-panels",
-    "name": "Accent Wall Panel – Oak",
-    "description": "Warm oak slats for modern interiors.",
+    "name": "Wood Wall Panel",
+    "description": "Wood Wall panels for modern interiors.",
     "images": [
       "https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=1600&auto=format&fit=crop"
     ],
     "price": 120,
     "unit": "unit",
-    "attributes": {"material": "oak", "panelSize": "2.4m x 0.6m"},
+    "attributes": {"material": "Wood/Vinyl", "panelSize": "2.4m x 0.6m"},
     "arMeasureEnabled": true
   },
   {
-    "id": "p4",
-    "slug": "accent-wall-panel-walnut",
+    "id": "p5",
+    "slug": "Wallpaper",
     "categorySlug": "decorative-panels",
-    "name": "Accent Wall Panel – Walnut",
-    "description": "Rich walnut tone with acoustic felt backing.",
+    "name": "Wallpaper",
+    "description": "Wallpapers for modern interiors.",
     "images": [
       "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1600&auto=format&fit=crop"
     ],
     "price": 150,
     "unit": "unit",
-    "attributes": {"material": "walnut", "panelSize": "2.4m x 0.6m"},
+    "attributes": {"material": "Paper", "panelSize": "2.4m x 0.6m"},
     "arMeasureEnabled": true
   },
+{
+    "id": "p6",
+    "slug": "Acoustic-Wall-Panel",
+    "categorySlug": "decorative-panels",
+    "name": "Acoustic Wall Panel",
+    "description": "Acoustic wall panels for modern interiors.",
+    "images": [
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "price": 150,
+    "unit": "unit",
+    "attributes": {"material": "Foam", "panelSize": "2.4m x 0.6m"},
+    "arMeasureEnabled": true
+  },
+
   {
-    "id": "p5",
+    "id": "p7",
     "slug": "epoxy-floor-standard",
     "categorySlug": "epoxy-flooring",
     "name": "Epoxy Floor – Standard",
@@ -71,5 +104,34 @@
     "unit": "sqft",
     "attributes": {"thickness": "2mm", "finish": "satin"},
     "arMeasureEnabled": false
+  },
+  {
+    "id": "p8",
+    "slug": "Micro-Cement",
+    "categorySlug": "epoxy-flooring",
+    "name": "Micro-Cement",
+    "description": "Granular, ideal for any area internal/external.",
+    "images": [
+      "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "price": 3.5,
+    "unit": "sqft",
+    "attributes": {"finish": "granular", "washable": "high"},
+    "arMeasureEnabled": false
+  },
+  {
+    "id": "p9",
+    "slug": "Tiles",
+    "categorySlug": "epoxy-flooring",
+    "name": "Tiles",
+    "description": "Smooth, patterned, ideal for any area internal/external.",
+    "images": [
+      "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "price": 3.5,
+    "unit": "sqft",
+    "attributes": {"finish": "customer defined", "washable": "high"},
+    "arMeasureEnabled": false
   }
+  
 ]
