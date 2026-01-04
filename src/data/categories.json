@@ -7,14 +7,14 @@
   },
   {
     "id": "panels",
-    "name": "Decorative Panels",
+    "name": "Wall Coverings",
     "slug": "decorative-panels",
     "heroImage": "/images/category-panels.jpg"
   },
   {
     "id": "flooring",
-    "name": "Epoxy Flooring",
-    "slug": "epoxy-flooring",
+    "name": "Flooring",
+    "slug": "flooring",
     "heroImage": "/images/category-flooring.jpg"
   }
 ]
