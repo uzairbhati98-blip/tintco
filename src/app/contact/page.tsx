@@ -116,7 +116,7 @@ export default function ContactPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white rounded-3xl shadow-soft p-8"
+                className="rounded-2xl overflow-hidden border card-hover p-8"
               >
                 <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
                 
@@ -238,7 +238,7 @@ export default function ContactPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 + i * 0.1 }}
-                    className="bg-white rounded-2xl p-6 shadow-soft hover:shadow-xl transition-all duration-300"
+                    className="rounded-2xl overflow-hidden border card-hover p-6"
                   >
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -324,7 +324,7 @@ export default function ContactPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-2xl p-6 shadow-soft hover:shadow-xl transition-all"
+                className="rounded-2xl overflow-hidden border card-hover p-6"
               >
                 <h3 className="font-semibold mb-2">{faq.question}</h3>
                 <p className="text-text/70">{faq.answer}</p>

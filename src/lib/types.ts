@@ -18,6 +18,7 @@ export type Product = {
   attributes?: Record<string, string | number>;
   arMeasureEnabled: boolean;
   colorPickerEnabled?: boolean;
+  colorVariants?: Record<string, string[]>;
 }
 
 export type CartItem = {

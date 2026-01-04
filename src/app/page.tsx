@@ -91,7 +91,7 @@ export default function Home() {
             <Link 
               key={c.title} 
               href={c.href} 
-              className="group block rounded-2xl overflow-hidden bg-white shadow-soft transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 animate-fadeInUp"
+              className="rounded-2xl overflow-hidden border card-hover animate-fadeInUp"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="relative aspect-[4/3] overflow-hidden">
@@ -187,41 +187,38 @@ export default function Home() {
         </div>
         
         <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.slice(0, 3).map((t, i) => (
-            <div 
-              key={i} 
-              className="rounded-2xl border-2 border-gray-100 p-6 bg-white hover:border-brand/30 hover:shadow-lg transition-all duration-300 animate-fadeInUp"
-              style={{ animationDelay: `${i * 100}ms` }}
-            >
-              {/* Quote marks */}
-              <div className="text-5xl text-brand/20 font-serif leading-none mb-4">"</div>
-              
-              <p className="text-gray-700 mb-4 italic">
-                {t.quote}
-              </p>
-              
-              <div className="flex items-center gap-3">
-                {/* Avatar placeholder */}
-                <div className="w-10 h-10 bg-brand/10 rounded-full flex items-center justify-center">
-                  <span className="text-brand font-semibold">
-                    {t.author.charAt(0)}
-                  </span>
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">{t.author}</div>
-                  <div className="text-xs text-text/50">Verified Customer</div>
-                </div>
+        {testimonials.slice(0, 3).map((t, i) => (
+          <div 
+            key={i} 
+            className="rounded-2xl border card-hover p-6 animate-fadeInUp"
+            style={{ animationDelay: `${i * 100}ms` }}
+          >
+            <div className="text-5xl text-brand/20 font-serif leading-none mb-4">"</div>
+            
+            <p className="text-gray-700 mb-4 italic">
+              {t.quote}
+            </p>
+            
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand/10 rounded-full flex items-center justify-center">
+                <span className="text-brand font-semibold">
+                  {t.author.charAt(0)}
+                </span>
               </div>
-              
-              {/* Rating stars */}
-              <div className="mt-4 flex gap-1">
-                {[...Array(5)].map((_, j) => (
-                  <span key={j} className="text-brand">★</span>
-                ))}
+              <div>
+                <div className="font-semibold text-sm">{t.author}</div>
+                <div className="text-xs text-text/50">Verified Customer</div>
               </div>
             </div>
-          ))}
-        </div>
+            
+            <div className="mt-4 flex gap-1">
+              {[...Array(5)].map((_, j) => (
+                <span key={j} className="text-brand">★</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
       </section>
 
       {/* CTA Section */}

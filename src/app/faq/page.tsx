@@ -252,7 +252,7 @@ export default function FAQPage() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: i * 0.05 }}
-                          className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden hover:border-brand/30 transition-colors"
+                          className="rounded-2xl overflow-hidden border card-hover"
                         >
                           <button
                             onClick={() => toggleExpand(id)}
@@ -303,7 +303,7 @@ export default function FAQPage() {
           <div className="grid md:grid-cols-3 gap-6">
             <a
               href="tel:+15551234567"
-              className="bg-white rounded-2xl p-6 hover:shadow-xl transition-all group"
+              className="rounded-2xl overflow-hidden border card-hover p-6 group"
             >
               <Phone className="w-8 h-8 text-brand mx-auto mb-3 group-hover:scale-110 transition-transform" />
               <h3 className="font-semibold mb-1">Call Us</h3>

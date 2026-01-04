@@ -1,27 +1,48 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
+import type { Product } from '@/lib/types'
 
 interface ProductGalleryProps {
   images: string[]
   name: string
+  product?: Product  // ✅ NEW: Pass full product for color variants
+  selectedColorHex?: string | null  // ✅ NEW: Currently selected color
 }
 
-export function ProductGallery({ images, name }: ProductGalleryProps) {
+export function ProductGallery({ images, name, product, selectedColorHex }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isZoomed, setIsZoomed] = useState(false)
 
+  // ✅ NEW: Get images based on selected color
+  const displayImages = (() => {
+    if (!selectedColorHex || !product?.colorVariants) {
+      return images
+    }
+
+    const variantImages = product.colorVariants[selectedColorHex]
+    if (variantImages && variantImages.length > 0) {
+      return variantImages
+    }
+
+    return images
+  })()
+
+  // ✅ Reset to first image when color changes
+  useEffect(() => {
+    setSelectedIndex(0)
+  }, [selectedColorHex])
+
   const handlePrevious = () => {
-    setSelectedIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+    setSelectedIndex((prev) => (prev === 0 ? displayImages.length - 1 : prev - 1))
   }
 
   const handleNext = () => {
-    setSelectedIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+    setSelectedIndex((prev) => (prev === displayImages.length - 1 ? 0 : prev + 1))
   }
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') handlePrevious()
@@ -31,16 +52,15 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [displayImages.length])
 
   return (
     <>
       <div>
-        {/* Main Image Container */}
         <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 mb-4 group">
           <AnimatePresence mode="wait">
             <motion.div
-              key={selectedIndex}
+              key={`${selectedColorHex}-${selectedIndex}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.05 }}
@@ -48,7 +68,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
               className="relative w-full h-full"
             >
               <Image
-                src={images[selectedIndex]}
+                src={displayImages[selectedIndex]}
                 alt={`${name} - View ${selectedIndex + 1}`}
                 fill
                 className="object-cover cursor-zoom-in"
@@ -59,8 +79,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation Arrows */}
-          {images.length > 1 && (
+          {displayImages.length > 1 && (
             <>
               <button
                 onClick={handlePrevious}
@@ -79,22 +98,19 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
             </>
           )}
 
-          {/* Zoom Icon */}
           <div className="absolute top-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
             <ZoomIn className="w-5 h-5" />
           </div>
 
-          {/* Image Counter */}
-          {images.length > 1 && (
+          {displayImages.length > 1 && (
             <div className="absolute bottom-4 left-4 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-sm">
-              {selectedIndex + 1} / {images.length}
+              {selectedIndex + 1} / {displayImages.length}
             </div>
           )}
 
-          {/* Navigation Dots */}
-          {images.length > 1 && (
+          {displayImages.length > 1 && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-              {images.map((_, i) => (
+              {displayImages.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setSelectedIndex(i)}
@@ -110,10 +126,9 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
           )}
         </div>
 
-        {/* Thumbnail Gallery */}
-        {images.length > 1 && (
+        {displayImages.length > 1 && (
           <div className="grid grid-cols-4 gap-3">
-            {images.map((img, i) => (
+            {displayImages.map((img, i) => (
               <motion.button
                 key={i}
                 whileHover={{ scale: 1.05 }}
@@ -141,7 +156,6 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
         )}
       </div>
 
-      {/* Lightbox/Zoom Modal */}
       <AnimatePresence>
         {isZoomed && (
           <motion.div
@@ -159,14 +173,13 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <Image
-                src={images[selectedIndex]}
+                src={displayImages[selectedIndex]}
                 alt={`${name} - Zoomed view`}
                 fill
                 className="object-contain"
                 sizes="100vw"
               />
 
-              {/* Close button */}
               <button
                 onClick={() => setIsZoomed(false)}
                 className="absolute top-4 right-4 w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors"
@@ -175,8 +188,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                 ✕
               </button>
 
-              {/* Navigation in lightbox */}
-              {images.length > 1 && (
+              {displayImages.length > 1 && (
                 <>
                   <button
                     onClick={(e) => {
@@ -205,6 +217,3 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
     </>
   )
 }
-
-// Also add missing import to fix
-import { useEffect } from 'react'

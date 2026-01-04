@@ -2,19 +2,19 @@
   {
     "id": "Wall-Painting",
     "name": "Wall Painting",
-    "slug": "painting",
+    "slug": "Wall-painting",
     "heroImage": "/images/category-painting.jpg"
   },
   {
     "id": "Wall-Coverings",
     "name": "Wall Coverings",
-    "slug": "decorative-panels",
+    "slug": "Wall-Coverings",
     "heroImage": "/images/category-panels.jpg"
   },
   {
     "id": "Flooring",
     "name": "Flooring",
-    "slug": "flooring",
+    "slug": "Flooring",
     "heroImage": "/images/category-flooring.jpg"
   }
 ]

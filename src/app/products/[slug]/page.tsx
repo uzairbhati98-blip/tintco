@@ -6,6 +6,7 @@ import { ClientProductActions } from './client-product-actions'
 import { ARMeasureButton } from '@/components/ar-measure-button'
 import { PaintCustomizer } from '@/components/paint-customizer'
 import { Star, Check, Truck, Shield, Palette } from 'lucide-react'
+import { ProductDisplayClient } from './product-display-client'
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -21,15 +22,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     count: 127,
   }
 
-  const isPaintProduct = product.categorySlug === 'painting'
+  const isPaintProduct = product.categorySlug === 'Wall-painting'
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <div className="grid lg:grid-cols-2 gap-12">
         <div>
-          <ProductGallery
-            images={product.images?.length ? product.images : ['/placeholder.jpg']}
-            name={product.name}
+          <ProductDisplayClient 
+            product={product}
+            renderGalleryOnly={true}
           />
 
           <div className="mt-6 grid grid-cols-3 gap-4 text-sm text-text/70">
@@ -98,7 +99,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
           {isPaintProduct && (
             <div className="mb-8">
-              <PaintCustomizer
+              <ProductDisplayClient 
+                product={product}
+                renderCustomizerOnly={true}
               />
             </div>
           )}

@@ -256,6 +256,18 @@ a, button {
   }
 }
 
+/* Card Hover Effect */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-color: rgb(0 0 0 / 2);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.12);
+  border-color: rgb(0 0 0 / 2); /* brand color with opacity */
+}
+
 /* Print styles */
 @media print {
   .no-print {

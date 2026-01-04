@@ -8,41 +8,28 @@ import { PAINT_FINISHES } from '@/lib/finishes'
 import type { SelectedColor, FinishType, PaintCustomization } from '@/lib/types'
 
 interface PaintCustomizerProps {
-  onCustomizationChange?: (customization: PaintCustomization) => void
+  onColorChange?: (color: SelectedColor | null) => void  // ✅ NEW
 }
 
-export function PaintCustomizer({ onCustomizationChange }: PaintCustomizerProps) {
+export function PaintCustomizer({ onColorChange }: PaintCustomizerProps) {
   const [selectedColor, setSelectedColor] = useState<SelectedColor | null>(null)
   const [selectedFinish, setSelectedFinish] = useState<FinishType | null>(null)
 
   const handleColorChange = (color: SelectedColor) => {
     setSelectedColor(color)
-    
-    // Notify parent of customization change
-    onCustomizationChange?.({
-      color,
-      finish: selectedFinish
-    })
+    onColorChange?.(color)  // ✅ Notify parent
   }
 
   const handleFinishChange = (finish: FinishType) => {
     setSelectedFinish(finish)
-    
-    // Notify parent of customization change
-    onCustomizationChange?.({
-      color: selectedColor,
-      finish
-    })
   }
 
   return (
     <div className="space-y-8">
-      {/* Color Picker */}
       <div className="p-6 bg-white rounded-2xl border-2 border-gray-100">
         <ColorPicker onColorChange={handleColorChange} />
       </div>
 
-      {/* Finish Selector - Only shows after color is selected */}
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -62,7 +49,6 @@ export function PaintCustomizer({ onCustomizationChange }: PaintCustomizerProps)
         </motion.div>
       </AnimatePresence>
 
-      {/* Summary - Shows when both are selected */}
       {selectedColor && selectedFinish && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

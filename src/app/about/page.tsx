@@ -178,7 +178,7 @@ export default function AboutPage() {
               return (
                 <div 
                   key={i}
-                  className="bg-white p-8 rounded-2xl shadow-soft hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                  className="rounded-2xl overflow-hidden border card-hover p-8"
                 >
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-brand/10 rounded-xl mb-4">
                     <Icon className="w-7 h-7 text-brand" />
