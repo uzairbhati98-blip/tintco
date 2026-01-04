@@ -94,7 +94,7 @@
   {
     "id": "p7",
     "slug": "epoxy-floor-standard",
-    "categorySlug": "epoxy-flooring",
+    "categorySlug": "flooring",
     "name": "Epoxy Floor – Standard",
     "description": "Durable, easy‑clean epoxy for garages & basements.",
     "images": [
@@ -108,7 +108,7 @@
   {
     "id": "p8",
     "slug": "Micro-Cement",
-    "categorySlug": "epoxy-flooring",
+    "categorySlug": "flooring",
     "name": "Micro-Cement",
     "description": "Granular, ideal for any area internal/external.",
     "images": [
@@ -122,7 +122,7 @@
   {
     "id": "p9",
     "slug": "Tiles",
-    "categorySlug": "epoxy-flooring",
+    "categorySlug": "flooring",
     "name": "Tiles",
     "description": "Smooth, patterned, ideal for any area internal/external.",
     "images": [
