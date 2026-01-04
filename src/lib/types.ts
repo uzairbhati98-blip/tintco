@@ -1,6 +1,6 @@
 export type Category = {
   id: string;
-  slug: 'painting' | 'decorative-panels' | 'epoxy-flooring';
+  slug: 'Wall-painting' | 'Wall-panels' | 'Flooring';
   name: string;
   description: string;
   heroImage: string;
