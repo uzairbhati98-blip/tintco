@@ -42,7 +42,7 @@ export default function Home() {
             <div className="relative lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 animate-fadeIn">
               <div className="aspect-[4/3] lg:aspect-auto lg:h-full rounded-2xl lg:rounded-l-3xl overflow-hidden shadow-2xl">
                 <Image 
-                  src="https://images.unsplash.com/photo-1505691723518-36a5ac3b2d42?q=80&w=1600&auto=format&fit=crop" 
+                  src="/images/hero-image.jpg" 
                   alt="Elegant interior showcasing our premium finishes" 
                   fill 
                   className="object-cover"
@@ -67,24 +67,30 @@ export default function Home() {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
               title: 'Wall Painting',
               href: '/categories/painting',
-              img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1600&auto=format&fit=crop',
+              img: '/images/category-wallpaint.png',
               description: 'Premium paints with perfect finish'
             },
             {
               title: 'Wall Coverings',
               href: '/categories/panels',
-              img: 'https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=1600&auto=format&fit=crop',
+              img: '/images/category-panels.jpg',
               description: '3D textures and modern designs'
             },
             {
               title: 'Flooring',
               href: '/categories/flooring',
-              img: 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1600&auto=format&fit=crop',
+              img: '/images/category-flooring.png',
+              description: 'Durable and stylish floor coatings'
+            },
+            {
+              title: 'Tiles',
+              href: '/categories/tiles',
+              img: '/images/category-tiles.jpeg',
               description: 'Durable and stylish floor coatings'
             }
           ].map((c, i) => (
@@ -135,12 +141,12 @@ export default function Home() {
               {
                 icon: <Smartphone className="w-10 h-10" />,
                 title: 'Measure with AR',
-                description: 'Use your phone camera to instantly measure walls and spaces'
+                description: 'Use your phone to instantly measure walls'
               },
               {
                 icon: <DollarSign className="w-10 h-10" />,
                 title: 'Get instant estimate',
-                description: 'Our calculator gives you an estimated price in seconds'
+                description: 'Get an estimate in seconds'
               },
               {
                 icon: <Sparkles className="w-10 h-10" />,

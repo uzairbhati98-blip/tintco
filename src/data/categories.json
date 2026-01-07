@@ -3,7 +3,7 @@
     "id": "Wall-Painting",
     "name": "Wall Painting",
     "slug": "Wall-painting",
-    "heroImage": "/images/Category-paint.jpg"
+    "heroImage": "/images/category-wallpaint.png"
   },
   {
     "id": "Wall-Coverings",
@@ -15,6 +15,12 @@
     "id": "Flooring",
     "name": "Flooring",
     "slug": "Flooring",
-    "heroImage": "/images/category-flooring.jpg"
+    "heroImage": "/images/category-flooring.png"
+  },
+  {
+    "id": "Tiles",
+    "name": "Tiles",
+    "slug": "Tiles",
+    "heroImage": "/images/category-tiles.jpeg"
   }
 ]
