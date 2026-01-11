@@ -23,7 +23,7 @@ export function ClientProductActions({ product }: { product: Product }) {
             duration: 2500,
           });
         }}
-        className="px-6 py-3 rounded-2xl bg-brand text-black font-medium shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 transition-all"
+        className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95"
       >
         Add to Cart
       </motion.button>
@@ -36,7 +36,7 @@ export function ClientProductActions({ product }: { product: Product }) {
           setFromProduct(product);
           location.href = "/quote";
         }}
-        className="px-6 py-3 rounded-2xl border border-brand text-brand font-medium hover:bg-brand hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2"
+        className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95"
       >
         Get Quick Quote
       </motion.button>

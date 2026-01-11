@@ -56,7 +56,7 @@ export default function CartPage() {
           </p>
           <Link 
             href="/categories"
-            className="inline-flex items-center gap-2 bg-brand hover:bg-brand/90 text-black font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 bg-brand border-2 hover:bg-brand/90 text-black font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
           >
             Start Shopping
             <ArrowRight className="w-4 h-4" />
@@ -258,7 +258,7 @@ export default function CartPage() {
 
               <button
                 onClick={handleCheckout}
-                className="w-full bg-brand hover:bg-brand/90 text-black font-semibold py-4 rounded-2xl transition-all hover:shadow-xl mb-4"
+                className="w-full bg-brand border-2 hover:bg-brand/90 text-black font-semibold py-4 rounded-2xl transition-all hover:shadow-xl mb-4"
               >
                 Proceed to Checkout
               </button>

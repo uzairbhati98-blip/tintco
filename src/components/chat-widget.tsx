@@ -9,8 +9,6 @@ interface Message {
   id: string
 }
 
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://your-n8n-instance.com/webhook/ai-support'
-
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
@@ -41,7 +39,10 @@ export function ChatWidget() {
     }
   }, [isOpen])
 
+  // Get or create session ID
   const getSessionId = () => {
+    if (typeof window === 'undefined') return 'server'
+    
     let sessionId = sessionStorage.getItem('chatSessionId')
     if (!sessionId) {
       sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -50,11 +51,12 @@ export function ChatWidget() {
     return sessionId
   }
 
+  // Send message to API route
   const sendMessage = async () => {
     const message = inputValue.trim()
     if (!message || isLoading) return
 
-    // Add user message
+    // Add user message to chat
     const userMessage: Message = {
       id: Date.now().toString(),
       text: message,
@@ -65,7 +67,10 @@ export function ChatWidget() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(N8N_WEBHOOK_URL, {
+      console.log('📤 Sending message:', message)
+
+      // Call internal API route (no CORS issues!)
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,11 +82,15 @@ export function ChatWidget() {
         })
       })
 
+      console.log('📥 Response status:', response.status)
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
+        const errorData = await response.json()
+        throw new Error(errorData.message || `HTTP ${response.status}`)
       }
 
       const data = await response.json()
+      console.log('✅ Response data:', data)
 
       // Add bot response
       const botMessage: Message = {
@@ -92,10 +101,12 @@ export function ChatWidget() {
       setMessages(prev => [...prev, botMessage])
 
     } catch (error) {
-      console.error('Chat error:', error)
+      console.error('❌ Chat error:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment or contact support@yourcompany.com",
+        text: error instanceof Error 
+          ? error.message 
+          : "I'm sorry, I'm having trouble connecting right now. Please try again in a moment or contact support@tintco.com",
         sender: 'bot'
       }
       setMessages(prev => [...prev, errorMessage])
@@ -104,6 +115,7 @@ export function ChatWidget() {
     }
   }
 
+  // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -113,16 +125,18 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* Chat Bubble */}
+      {/* Chat Bubble Button - Tintco Brand Colors */}
       <motion.button
-        className="fixed bottom-5 right-5 z-[9999] w-[60px] h-[60px] rounded-full bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg flex items-center justify-center cursor-pointer"
-        whileHover={{ scale: 1.1 }}
+        className="fixed bottom-5 right-5 z-[9999] w-[60px] h-[60px] rounded-full shadow-lg flex items-center justify-center cursor-pointer"
+        style={{ background: '#FFCA2C' }} // Mustard Gold
+        whileHover={{ scale: 1.1, boxShadow: '0 8px 24px rgba(255, 202, 44, 0.4)' }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle chat"
       >
         <svg 
-          className="w-7 h-7 fill-white" 
+          className="w-7 h-7"
+          style={{ fill: '#1E1E1E' }} // Almost Black
           xmlns="http://www.w3.org/2000/svg" 
           viewBox="0 0 24 24"
         >
@@ -130,7 +144,7 @@ export function ChatWidget() {
         </svg>
       </motion.button>
 
-      {/* Chat Window */}
+      {/* Chat Window - Tintco Surface System */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -138,50 +152,80 @@ export function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-[90px] right-5 z-[9998] w-[380px] max-w-[calc(100vw-40px)] h-[550px] max-h-[calc(100vh-120px)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-[90px] right-5 z-[9998] w-[380px] h-[calc(100vh-120px)] max-h-[600px] bg-white rounded-2xl flex flex-col overflow-hidden"
+            style={{
+              border: '1px solid rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
+            }}
           >
-            {/* Header */}
-            <div className="bg-gradient-to-br from-purple-600 to-purple-800 text-white p-4 flex justify-between items-center">
+            {/* Header - Tintco Brand */}
+            <div 
+              className="p-6 flex justify-between items-center"
+              style={{ 
+                background: '#FFCA2C', // Mustard Gold
+                color: '#1E1E1E' // Almost Black
+              }}
+            >
               <div>
-                <h3 className="font-semibold text-base">AI Support Assistant</h3>
-                <p className="text-xs opacity-90 mt-0.5">We&apos;re here to help!</p>
+                <h3 className="font-semibold text-base">Tintco Support</h3>
+                <p className="text-xs opacity-80 mt-0.5">We&apos;re here to help!</p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-2xl leading-none"
+                className="w-8 h-8 flex items-center justify-center rounded-full transition-all text-2xl leading-none"
+                style={{ 
+                  color: '#1E1E1E',
+                  background: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(30, 30, 30, 0.1)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                }}
                 aria-label="Close chat"
               >
                 &times;
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-5 bg-gray-50 flex flex-col gap-3">
+            {/* Messages Container */}
+            <div className="flex-1 overflow-y-auto p-6 bg-white flex flex-col gap-3">
               {messages.map((msg) => (
                 <motion.div
                   key={msg.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`max-w-[75%] px-3.5 py-2.5 rounded-xl text-sm leading-relaxed ${
+                  className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                     msg.sender === 'user'
-                      ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white self-end rounded-br-sm'
-                      : 'bg-white text-gray-800 self-start border border-gray-200 rounded-bl-sm'
+                      ? 'self-end rounded-br-sm'
+                      : 'self-start rounded-bl-sm surface'
                   }`}
+                  style={msg.sender === 'user' ? {
+                    background: '#FFCA2C', // Mustard Gold
+                    color: '#1E1E1E' // Almost Black
+                  } : {
+                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                    color: '#1E1E1E'
+                  }}
                 >
                   {msg.text}
                 </motion.div>
               ))}
 
+              {/* Loading Indicator */}
               {isLoading && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="bg-white self-start px-3.5 py-4 rounded-xl border border-gray-200 rounded-bl-sm flex gap-1"
+                  className="self-start px-4 py-4 rounded-2xl rounded-bl-sm surface flex gap-1.5"
+                  style={{ border: '1px solid rgba(0, 0, 0, 0.08)' }}
                 >
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
-                      className="w-2 h-2 bg-gray-400 rounded-full"
+                      className="w-2 h-2 rounded-full"
+                      style={{ background: '#FFCA2C' }}
                       animate={{ scale: [0, 1, 0] }}
                       transition={{
                         duration: 1.4,
@@ -194,11 +238,15 @@ export function ChatWidget() {
                 </motion.div>
               )}
 
+              {/* Scroll anchor */}
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="p-4 bg-white border-t border-gray-200 flex gap-2.5">
+            {/* Input Area - Tintco Surface */}
+            <div 
+              className="p-4 bg-white flex gap-3"
+              style={{ borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}
+            >
               <input
                 ref={inputRef}
                 type="text"
@@ -207,12 +255,34 @@ export function ChatWidget() {
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
                 disabled={isLoading}
-                className="flex-1 px-3.5 py-2.5 border border-gray-300 rounded-full text-sm outline-none focus:border-purple-600 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-3 rounded-full text-sm outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  color: '#1E1E1E'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#FFCA2C'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)'
+                }}
               />
               <button
                 onClick={sendMessage}
                 disabled={isLoading || !inputValue.trim()}
-                className="bg-gradient-to-br from-purple-600 to-purple-800 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 rounded-full text-sm font-semibold transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: '#FFCA2C', // Mustard Gold
+                  color: '#1E1E1E' // Almost Black
+                }}
+                onMouseEnter={(e) => {
+                  if (!isLoading && inputValue.trim()) {
+                    e.currentTarget.style.opacity = '0.9'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '1'
+                }}
               >
                 Send
               </button>
@@ -221,10 +291,10 @@ export function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Mobile Full-Screen Overlay */}
+      {/* Mobile Responsive - Full Screen on Small Devices */}
       <style jsx global>{`
         @media (max-width: 480px) {
-          .chat-window-mobile {
+          .fixed.bottom-\\[90px\\].right-5.z-\\[9998\\] {
             bottom: 0 !important;
             right: 0 !important;
             left: 0 !important;

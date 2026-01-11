@@ -240,14 +240,14 @@ export default function AboutPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link 
               href="/quote"
-              className="inline-flex items-center gap-2 bg-brand hover:bg-brand/90 text-black font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 bg-brand border-2 hover:bg-brand/90 text-black font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
             >
               Get Free Quote
               <ChevronRight className="w-4 h-4" />
             </Link>
             <Link 
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-text font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 bg-white border-2 hover:bg-gray-50 text-text font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
             >
               Contact Us
             </Link>

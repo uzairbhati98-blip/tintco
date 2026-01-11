@@ -332,7 +332,7 @@ export default function FAQPage() {
           <div className="mt-8">
             <Link 
               href="/contact"
-              className="inline-flex items-center gap-2 bg-brand hover:bg-brand/90 text-black font-semibold px-8 py-4 rounded-2xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5"
+              className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95"
             >
               Contact Support
             </Link>

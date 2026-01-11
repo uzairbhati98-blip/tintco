@@ -24,16 +24,10 @@ export default function Home() {
               </p>
               <div className="mt-8 flex flex-wrap gap-4 animate-fadeInUp animation-delay-200">
                 <Link 
-                  className="inline-flex rounded-2xl bg-brand hover:bg-brand/90 text-black px-8 py-3.5 font-semibold shadow-soft transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 active:scale-95" 
+                  className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95" 
                   href="/categories"
                 >
                   Shop Now
-                </Link>
-                <Link 
-                  className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95" 
-                  href="/quote"
-                >
-                  Get a Quote
                 </Link>
               </div>
             </div>
@@ -238,14 +232,8 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center animate-fadeInUp animation-delay-200">
             <Link 
-              href="/quote"
-              className="inline-flex rounded-2xl bg-brand hover:bg-brand/90 text-black px-8 py-4 font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
-            >
-              Get Your Free Quote
-            </Link>
-            <Link 
               href="/categories"
-              className="inline-flex rounded-2xl bg-white hover:bg-gray-50 text-text px-8 py-4 font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
+              className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95"
             >
               View Our Catalog
             </Link>

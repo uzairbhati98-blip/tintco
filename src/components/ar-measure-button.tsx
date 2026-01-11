@@ -50,7 +50,7 @@ export function ARMeasureButton({ product }: Props) {
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 300 }}
         onClick={() => setIsModalOpen(true)}
-        className="px-6 py-3 rounded-2xl bg-brand/90 hover:bg-brand text-black font-medium shadow-sm focus:ring-2 focus:ring-brand focus:ring-offset-2"
+        className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95"
       >
         Measure with AR
       </motion.button>
