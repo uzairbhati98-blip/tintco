@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { ProductGallery } from '@/components/product-gallery'
-import { PaintCustomizer } from '@/components/paint-customizer'
+import { ProductCustomizer } from '@/components/product-customizer'
 import { ClientProductActions } from './client-product-actions'
 import { ARMeasureButton } from '@/components/ar-measure-button'
 import { Star, Check, Truck, Shield, Palette } from 'lucide-react'
-import type { Product, SelectedColor } from '@/lib/types'
+import type { Product, SelectedColor, SelectedVariant } from '@/lib/types'
 
 interface ProductDisplayClientProps {
   product: Product
@@ -20,6 +20,10 @@ export function ProductDisplayClient({
   reviews = { average: 4.8, count: 127 } 
 }: ProductDisplayClientProps) {
   const [selectedColor, setSelectedColor] = useState<SelectedColor | null>(null)
+  const [selectedVariant, setSelectedVariant] = useState<SelectedVariant | null>(null)
+  
+  // Get the key for image switching (either color hex or variant value)
+  const imageKey = selectedColor?.hex || selectedVariant?.value || null
 
   return (
     <div className="grid lg:grid-cols-2 gap-12">
@@ -29,7 +33,7 @@ export function ProductDisplayClient({
           images={product.images}
           name={product.name}
           product={product}
-          selectedColorHex={selectedColor?.hex}
+          selectedKey={imageKey}
         />
 
         <div className="mt-6 grid grid-cols-3 gap-4 text-sm text-text/70">
@@ -97,11 +101,14 @@ export function ProductDisplayClient({
           </div>
         </div>
 
-        {isPaintProduct && (
-          <div className="mb-8">
-            <PaintCustomizer onColorChange={setSelectedColor} />
-          </div>
-        )}
+        {/* Smart Product Customizer - shows color picker OR variant selector OR nothing */}
+        <div className="mb-8">
+          <ProductCustomizer 
+            product={product}
+            onColorChange={setSelectedColor}
+            onVariantChange={setSelectedVariant}
+          />
+        </div>
 
         <div className="space-y-3 mb-8">
           <ClientProductActions product={product} />

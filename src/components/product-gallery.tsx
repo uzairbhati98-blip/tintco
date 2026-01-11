@@ -8,32 +8,43 @@ import type { Product } from '@/lib/types'
 interface ProductGalleryProps {
   images: string[]
   name: string
-  product?: Product  // ✅ NEW: Pass full product for color variants
-  selectedColorHex?: string | null  // ✅ NEW: Currently selected color
+  product?: Product
+  selectedKey?: string | null  // Can be color hex OR variant value
 }
 
-export function ProductGallery({ images, name, product, selectedColorHex }: ProductGalleryProps) {
+export function ProductGallery({ images, name, product, selectedKey }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isZoomed, setIsZoomed] = useState(false)
 
-  // ✅ NEW: Get images based on selected color
+  // Get images based on selected key (works for both colorVariants and variants)
   const displayImages = (() => {
-    if (!selectedColorHex || !product?.colorVariants) {
+    if (!selectedKey || !product) {
       return images
     }
 
-    const variantImages = product.colorVariants[selectedColorHex]
-    if (variantImages && variantImages.length > 0) {
-      return variantImages
+    // Try colorVariants first (for paint products)
+    if (product.colorVariants && product.colorVariants[selectedKey]) {
+      const variantImages = product.colorVariants[selectedKey]
+      if (variantImages && variantImages.length > 0) {
+        return variantImages
+      }
+    }
+
+    // Try generic variants (for other products)
+    if (product.variants && product.variants[selectedKey]) {
+      const variantImages = product.variants[selectedKey]
+      if (variantImages && variantImages.length > 0) {
+        return variantImages
+      }
     }
 
     return images
   })()
 
-  // ✅ Reset to first image when color changes
+  // Reset to first image when selection changes
   useEffect(() => {
     setSelectedIndex(0)
-  }, [selectedColorHex])
+  }, [selectedKey])
 
   const handlePrevious = () => {
     setSelectedIndex((prev) => (prev === 0 ? displayImages.length - 1 : prev - 1))
@@ -60,7 +71,7 @@ export function ProductGallery({ images, name, product, selectedColorHex }: Prod
         <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100 mb-4 group">
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${selectedColorHex}-${selectedIndex}`}
+              key={`${selectedKey}-${selectedIndex}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.05 }}

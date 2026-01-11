@@ -109,7 +109,6 @@
     "arMeasureEnabled": true,
     "colorPickerEnabled": true
   },
-
   {
     "id": "p2",
     "slug": "micro-cement-wall",
@@ -123,10 +122,8 @@
     "price": 1.8,
     "unit": "sqft",
     "attributes": {"finish": "Textured", "washable": "medium"},
-    "arMeasureEnabled": true,
-    "colorPickerEnabled": true
+    "arMeasureEnabled": true
   },
-
   {
     "id": "p3",
     "slug": "wood-wall-panel",
@@ -136,6 +133,17 @@
     "images": [
       "/images/wood-panel-wall-card-image.png"
     ],
+    "variantType": "material",
+    "variants": {
+      "oak": ["/images/Wall-Coverings/wood-panel/oak-1.png", "/images/Wall-Coverings/wood-panel/oak-2.png"],
+      "walnut": ["/images/Wall-Coverings/wood-panel/walnut-1.png"],
+      "maple": ["/images/Wall-Coverings/wood-panel/maple-1.png"],
+      "bamboo": ["/images/Wall-Coverings/wood-panel/bamboo-1.png"],
+      "white-vinyl": ["/images/Wall-Coverings/wood-panel/white-vinyl-1.png"],
+      "gray-vinyl": ["/images/Wall-Coverings/wood-panel/gray-vinyl-1.png"],
+      "black-vinyl": ["/images/Wall-Coverings/wood-panel/black-vinyl-1.png"],
+      "rustic-wood": ["/images/Wall-Coverings/wood-panel/rustic-1.png"]
+    },
     "price": 120,
     "unit": "unit",
     "attributes": {"material": "Wood/Vinyl", "panelSize": "2.4m x 0.6m"},
@@ -143,13 +151,20 @@
   },
   {
     "id": "p4",
-    "slug": "acoustic-Wall-Panel",
+    "slug": "acoustic-wall-panel",
     "categorySlug": "Wall-Coverings",
     "name": "Acoustic Wall Panel",
     "description": "Acoustic wall panels for modern interiors.",
     "images": [
       "/images/acoustic-panel-card-image.png"
     ],
+    "variantType": "material",
+    "variants": {
+      "charcoal-foam": ["/images/Wall-Coverings/acoustic/charcoal-1.png"],
+      "white-foam": ["/images/Wall-Coverings/acoustic/white-1.png"],
+      "gray-foam": ["/images/Wall-Coverings/acoustic/gray-1.png"],
+      "beige-foam": ["/images/Wall-Coverings/acoustic/beige-1.png"]
+    },
     "price": 150,
     "unit": "unit",
     "attributes": {"material": "Foam", "panelSize": "2.4m x 0.6m"},
@@ -164,6 +179,14 @@
     "images": [
       "/images/wallpaper-card-image.png"
     ],
+    "variantType": "pattern",
+    "variants": {
+      "floral": ["/images/Wall-Coverings/wallpaper/floral-1.png"],
+      "geometric": ["/images/Wall-Coverings/wallpaper/geometric-1.png"],
+      "striped": ["/images/Wall-Coverings/wallpaper/striped-1.png"],
+      "textured": ["/images/Wall-Coverings/wallpaper/textured-1.png"],
+      "damask": ["/images/Wall-Coverings/wallpaper/damask-1.png"]
+    },
     "price": 150,
     "unit": "unit",
     "attributes": {"material": "Paper", "panelSize": "2.4m x 0.6m"},
@@ -174,10 +197,20 @@
     "slug": "epoxy-flooring",
     "categorySlug": "Flooring",
     "name": "Epoxy",
-    "description": "Durable, easy‑clean epoxy for garages & basements.",
+    "description": "Durable, easy-clean epoxy for garages & basements.",
     "images": [
       "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1600&auto=format&fit=crop"
     ],
+    "variantType": "finish",
+    "variants": {
+      "glossy-clear": ["/images/Flooring/epoxy/glossy-clear-1.png"],
+      "matte-gray": ["/images/Flooring/epoxy/matte-gray-1.png"],
+      "metallic-silver": ["/images/Flooring/epoxy/metallic-silver-1.png"],
+      "glossy-white": ["/images/Flooring/epoxy/glossy-white-1.png"],
+      "charcoal-matte": ["/images/Flooring/epoxy/charcoal-matte-1.png"],
+      "metallic-copper": ["/images/Flooring/epoxy/metallic-copper-1.png"],
+      "semi-gloss-beige": ["/images/Flooring/epoxy/semi-gloss-beige-1.png"]
+    },
     "price": 3.5,
     "unit": "sqft",
     "attributes": {"thickness": "2mm", "finish": "satin"},
@@ -192,6 +225,15 @@
     "images": [
       "/images/microcement-product-card.jpg"
     ],
+    "variantType": "finish",
+    "variants": {
+      "smooth-gray": ["/images/Flooring/microcement/smooth-gray-1.png"],
+      "textured-white": ["/images/Flooring/microcement/textured-white-1.png"],
+      "smooth-beige": ["/images/Flooring/microcement/smooth-beige-1.png"],
+      "textured-charcoal": ["/images/Flooring/microcement/textured-charcoal-1.png"],
+      "smooth-cream": ["/images/Flooring/microcement/smooth-cream-1.png"],
+      "industrial-gray": ["/images/Flooring/microcement/industrial-gray-1.png"]
+    },
     "price": 3.5,
     "unit": "sqft",
     "attributes": {"finish": "granular", "washable": "high"},
@@ -206,6 +248,17 @@
     "images": [
       "/images/floor-tile-card.jpg"
     ],
+    "variantType": "pattern",
+    "variants": {
+      "marble-white": ["/images/Tiles/floor/marble-white-1.png"],
+      "marble-black": ["/images/Tiles/floor/marble-black-1.png"],
+      "wood-look": ["/images/Tiles/floor/wood-look-1.png"],
+      "concrete-gray": ["/images/Tiles/floor/concrete-gray-1.png"],
+      "terracotta": ["/images/Tiles/floor/terracotta-1.png"],
+      "slate-dark": ["/images/Tiles/floor/slate-dark-1.png"],
+      "hexagon-white": ["/images/Tiles/floor/hexagon-white-1.png"],
+      "mosaic-blue": ["/images/Tiles/floor/mosaic-blue-1.png"]
+    },
     "price": 3.5,
     "unit": "sqft",
     "attributes": {"finish": "customer defined", "washable": "high"},
@@ -220,10 +273,20 @@
     "images": [
       "/images/wall-tiles-card.png"
     ],
+    "variantType": "pattern",
+    "variants": {
+      "subway-white": ["/images/Tiles/wall/subway-white-1.png"],
+      "subway-black": ["/images/Tiles/wall/subway-black-1.png"],
+      "moroccan": ["/images/Tiles/wall/moroccan-1.png"],
+      "geometric-gray": ["/images/Tiles/wall/geometric-gray-1.png"],
+      "herringbone": ["/images/Tiles/wall/herringbone-1.png"],
+      "penny-round": ["/images/Tiles/wall/penny-round-1.png"],
+      "arabesque": ["/images/Tiles/wall/arabesque-1.png"],
+      "metro-beige": ["/images/Tiles/wall/metro-beige-1.png"]
+    },
     "price": 3.5,
     "unit": "sqft",
     "attributes": {"finish": "customer defined", "washable": "high"},
     "arMeasureEnabled": false
   }
-  
 ]

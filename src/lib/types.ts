@@ -1,6 +1,6 @@
 export type Category = {
   id: string;
-  slug: 'Wall-painting' | 'Wall-panels' | 'Flooring';
+  slug: 'Wall-painting' | 'Wall-Coverings' | 'Flooring' | 'Tiles';
   name: string;
   description: string;
   heroImage: string;
@@ -19,6 +19,9 @@ export type Product = {
   arMeasureEnabled: boolean;
   colorPickerEnabled?: boolean;
   colorVariants?: Record<string, string[]>;
+  // NEW: Generic variant system
+  variantType?: 'color' | 'material' | 'pattern' | 'finish';
+  variants?: Record<string, string[]>; // key: variant id, value: image paths
 }
 
 export type CartItem = {
@@ -49,6 +52,7 @@ export type QuoteRequest = {
   customerEmail?: string;
 }
 
+// PAINT COLOR SYSTEM
 export interface PaintColor {
   id: string;
   name: string;
@@ -63,7 +67,6 @@ export interface SelectedColor {
   rgb: { r: number; g: number; b: number };
 }
 
-// NEW: Finish types
 export type FinishType = 'gloss' | 'semi-gloss' | 'matte' | 'marble' | 'epoxy' | 'microcement'
 
 export interface PaintFinish {
@@ -77,4 +80,22 @@ export interface PaintFinish {
 export interface PaintCustomization {
   color: SelectedColor | null
   finish: FinishType | null
+}
+
+// NEW: GENERIC VARIANT SYSTEM
+export type VariantType = 'color' | 'material' | 'pattern' | 'finish'
+
+export interface Variant {
+  id: string
+  name: string
+  value: string // For colors: hex code, for others: identifier
+  thumbnail?: string // Optional preview image/color
+  description?: string
+  popular?: boolean
+}
+
+export interface SelectedVariant {
+  id: string
+  name: string
+  value: string
 }
