@@ -7,6 +7,7 @@ import { PageTransition } from "@/components/page-transition"
 import { ParticleBackground } from "@/components/particle-background"
 import { Toaster } from "@/components/ui/sonner"
 import { Inter, Playfair_Display } from "next/font/google"
+import { ChatWidget } from '@/components/chat-widget'
 
 const baseFont = Inter({ subsets: ["latin"], variable: "--font-base" })
 const brandFont = Playfair_Display({
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <Footer />
           <Toaster richColors position="top-center" />
+          <ChatWidget />
         </div>
       </body>
     </html>
