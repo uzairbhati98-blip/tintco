@@ -1,5 +1,8 @@
 /**
  * Pattern variants for Tiles
+ * 
+ * THUMBNAIL: Use actual tile pattern photos (200x200px)
+ * Example: '/images/thumbnails/patterns/marble-white.jpg'
  */
 
 import type { Variant } from '../types'
@@ -9,7 +12,7 @@ export const FLOOR_TILE_PATTERNS: Variant[] = [
     id: 'marble-white',
     name: 'White Marble',
     value: 'marble-white',
-    thumbnail: '#F8F8F8',
+    thumbnail: '/images/thumbnails/patterns/marble-white.jpg', // ← Real marble pattern photo
     description: 'Classic white marble veining',
     popular: true
   },
@@ -17,7 +20,7 @@ export const FLOOR_TILE_PATTERNS: Variant[] = [
     id: 'marble-black',
     name: 'Black Marble',
     value: 'marble-black',
-    thumbnail: '#1E1E1E',
+    thumbnail: '/images/thumbnails/patterns/marble-black.jpg', // ← Real black marble photo
     description: 'Dramatic black marble',
     popular: true
   },
@@ -25,7 +28,7 @@ export const FLOOR_TILE_PATTERNS: Variant[] = [
     id: 'wood-look',
     name: 'Wood Look',
     value: 'wood-look',
-    thumbnail: '#8B4513',
+    thumbnail: '/images/thumbnails/patterns/wood-look.jpg', // ← Wood-grain tile photo
     description: 'Natural wood-grain tiles',
     popular: true
   },
@@ -33,7 +36,7 @@ export const FLOOR_TILE_PATTERNS: Variant[] = [
     id: 'concrete-gray',
     name: 'Concrete Gray',
     value: 'concrete-gray',
-    thumbnail: '#808080',
+    thumbnail: '/images/thumbnails/patterns/concrete-gray.jpg', // ← Concrete texture photo
     description: 'Modern concrete finish',
     popular: true
   },
@@ -41,7 +44,7 @@ export const FLOOR_TILE_PATTERNS: Variant[] = [
     id: 'terracotta',
     name: 'Terracotta',
     value: 'terracotta',
-    thumbnail: '#E07A5F',
+    thumbnail: '/images/thumbnails/patterns/terracotta.jpg',
     description: 'Warm terracotta clay',
     popular: false
   },
@@ -49,7 +52,7 @@ export const FLOOR_TILE_PATTERNS: Variant[] = [
     id: 'slate-dark',
     name: 'Dark Slate',
     value: 'slate-dark',
-    thumbnail: '#36454F',
+    thumbnail: '/images/thumbnails/patterns/slate-dark.jpg',
     description: 'Natural slate texture',
     popular: false
   },
@@ -57,7 +60,7 @@ export const FLOOR_TILE_PATTERNS: Variant[] = [
     id: 'hexagon-white',
     name: 'White Hexagon',
     value: 'hexagon-white',
-    thumbnail: '#FFFFFF',
+    thumbnail: '/images/thumbnails/patterns/hexagon-white.jpg', // ← Hexagon tile pattern photo
     description: 'Geometric hexagon tiles',
     popular: true
   },
@@ -65,7 +68,7 @@ export const FLOOR_TILE_PATTERNS: Variant[] = [
     id: 'mosaic-blue',
     name: 'Blue Mosaic',
     value: 'mosaic-blue',
-    thumbnail: '#87CEEB',
+    thumbnail: '/images/thumbnails/patterns/mosaic-blue.jpg', // ← Mosaic pattern photo
     description: 'Decorative mosaic pattern',
     popular: false
   }
@@ -76,7 +79,7 @@ export const WALL_TILE_PATTERNS: Variant[] = [
     id: 'subway-white',
     name: 'White Subway',
     value: 'subway-white',
-    thumbnail: '#FFFFFF',
+    thumbnail: '/images/thumbnails/patterns/subway-white.jpg', // ← Classic subway tile photo
     description: 'Classic subway tile',
     popular: true
   },
@@ -84,7 +87,7 @@ export const WALL_TILE_PATTERNS: Variant[] = [
     id: 'subway-black',
     name: 'Black Subway',
     value: 'subway-black',
-    thumbnail: '#1E1E1E',
+    thumbnail: '/images/thumbnails/patterns/subway-black.jpg',
     description: 'Bold black subway',
     popular: true
   },
@@ -92,7 +95,7 @@ export const WALL_TILE_PATTERNS: Variant[] = [
     id: 'moroccan',
     name: 'Moroccan',
     value: 'moroccan',
-    thumbnail: '#4DB8A8',
+    thumbnail: '/images/thumbnails/patterns/moroccan.jpg', // ← Moroccan pattern photo
     description: 'Intricate Moroccan design',
     popular: true
   },
@@ -100,7 +103,7 @@ export const WALL_TILE_PATTERNS: Variant[] = [
     id: 'geometric-gray',
     name: 'Gray Geometric',
     value: 'geometric-gray',
-    thumbnail: '#A9A9A9',
+    thumbnail: '/images/thumbnails/patterns/geometric-gray.jpg', // ← Geometric tile photo
     description: 'Modern geometric pattern',
     popular: true
   },
@@ -108,7 +111,7 @@ export const WALL_TILE_PATTERNS: Variant[] = [
     id: 'herringbone',
     name: 'Herringbone',
     value: 'herringbone',
-    thumbnail: '#D9B99B',
+    thumbnail: '/images/thumbnails/patterns/herringbone.jpg', // ← Herringbone layout photo
     description: 'Elegant herringbone layout',
     popular: false
   },
@@ -116,7 +119,7 @@ export const WALL_TILE_PATTERNS: Variant[] = [
     id: 'penny-round',
     name: 'Penny Round',
     value: 'penny-round',
-    thumbnail: '#F5F5DC',
+    thumbnail: '/images/thumbnails/patterns/penny-round.jpg', // ← Round mosaic photo
     description: 'Round mosaic tiles',
     popular: false
   },
@@ -124,7 +127,7 @@ export const WALL_TILE_PATTERNS: Variant[] = [
     id: 'arabesque',
     name: 'Arabesque',
     value: 'arabesque',
-    thumbnail: '#98D8C8',
+    thumbnail: '/images/thumbnails/patterns/arabesque.jpg', // ← Arabesque tile photo
     description: 'Decorative arabesque shape',
     popular: true
   },
@@ -132,7 +135,7 @@ export const WALL_TILE_PATTERNS: Variant[] = [
     id: 'metro-beige',
     name: 'Beige Metro',
     value: 'metro-beige',
-    thumbnail: '#E8DCC4',
+    thumbnail: '/images/thumbnails/patterns/metro-beige.jpg',
     description: 'Warm beige metro tiles',
     popular: false
   }

@@ -1,5 +1,9 @@
 /**
  * Material variants for Wall Coverings
+ * 
+ * THUMBNAIL OPTIONS:
+ * 1. Image path: '/images/thumbnails/oak-thumb.jpg' - Shows actual product photo
+ * 2. Color hex: '#D4A574' - Shows solid color (fallback)
  */
 
 import type { Variant } from '../types'
@@ -9,7 +13,7 @@ export const WALL_MATERIALS: Variant[] = [
     id: 'oak',
     name: 'Oak Wood',
     value: 'oak',
-    thumbnail: '#D4A574', // Light brown color representing oak
+    thumbnail: '/images/thumbnails/materials/oak.jpg', // ← Use real wood grain photo!
     description: 'Natural oak with visible grain',
     popular: true
   },
@@ -17,7 +21,7 @@ export const WALL_MATERIALS: Variant[] = [
     id: 'walnut',
     name: 'Walnut',
     value: 'walnut',
-    thumbnail: '#5C4033', // Dark brown representing walnut
+    thumbnail: '/images/thumbnails/materials/walnut.jpg', // ← Use real walnut photo!
     description: 'Rich dark wood finish',
     popular: true
   },
@@ -25,7 +29,7 @@ export const WALL_MATERIALS: Variant[] = [
     id: 'maple',
     name: 'Maple Wood',
     value: 'maple',
-    thumbnail: '#E8C5A5', // Light cream representing maple
+    thumbnail: '/images/thumbnails/materials/maple.jpg',
     description: 'Light-colored, smooth grain',
     popular: false
   },
@@ -33,7 +37,7 @@ export const WALL_MATERIALS: Variant[] = [
     id: 'bamboo',
     name: 'Bamboo',
     value: 'bamboo',
-    thumbnail: '#D2B48C', // Tan representing bamboo
+    thumbnail: '/images/thumbnails/materials/bamboo.jpg',
     description: 'Sustainable bamboo panels',
     popular: true
   },
@@ -41,7 +45,7 @@ export const WALL_MATERIALS: Variant[] = [
     id: 'white-vinyl',
     name: 'White Vinyl',
     value: 'white-vinyl',
-    thumbnail: '#FFFFFF',
+    thumbnail: '/images/thumbnails/materials/white-vinyl.jpg',
     description: 'Clean modern white finish',
     popular: true
   },
@@ -49,7 +53,7 @@ export const WALL_MATERIALS: Variant[] = [
     id: 'gray-vinyl',
     name: 'Gray Vinyl',
     value: 'gray-vinyl',
-    thumbnail: '#808080',
+    thumbnail: '/images/thumbnails/materials/gray-vinyl.jpg',
     description: 'Contemporary gray tone',
     popular: false
   },
@@ -57,7 +61,7 @@ export const WALL_MATERIALS: Variant[] = [
     id: 'black-vinyl',
     name: 'Black Vinyl',
     value: 'black-vinyl',
-    thumbnail: '#1E1E1E',
+    thumbnail: '/images/thumbnails/materials/black-vinyl.jpg',
     description: 'Bold black accent',
     popular: false
   },
@@ -65,7 +69,7 @@ export const WALL_MATERIALS: Variant[] = [
     id: 'rustic-wood',
     name: 'Rustic Wood',
     value: 'rustic-wood',
-    thumbnail: '#8B4513', // Saddle brown
+    thumbnail: '/images/thumbnails/materials/rustic.jpg',
     description: 'Weathered, reclaimed look',
     popular: true
   }
@@ -76,7 +80,7 @@ export const ACOUSTIC_MATERIALS: Variant[] = [
     id: 'charcoal-foam',
     name: 'Charcoal Foam',
     value: 'charcoal-foam',
-    thumbnail: '#36454F',
+    thumbnail: '/images/thumbnails/materials/charcoal-foam.jpg', // ← Foam texture photo
     description: 'Sound-absorbing charcoal',
     popular: true
   },
@@ -84,7 +88,7 @@ export const ACOUSTIC_MATERIALS: Variant[] = [
     id: 'white-foam',
     name: 'White Foam',
     value: 'white-foam',
-    thumbnail: '#FFFFFF',
+    thumbnail: '/images/thumbnails/materials/white-foam.jpg',
     description: 'Clean white acoustic',
     popular: true
   },
@@ -92,7 +96,7 @@ export const ACOUSTIC_MATERIALS: Variant[] = [
     id: 'gray-foam',
     name: 'Gray Foam',
     value: 'gray-foam',
-    thumbnail: '#A9A9A9',
+    thumbnail: '/images/thumbnails/materials/gray-foam.jpg',
     description: 'Neutral gray tone',
     popular: false
   },
@@ -100,7 +104,7 @@ export const ACOUSTIC_MATERIALS: Variant[] = [
     id: 'beige-foam',
     name: 'Beige Foam',
     value: 'beige-foam',
-    thumbnail: '#F5F5DC',
+    thumbnail: '/images/thumbnails/materials/beige-foam.jpg',
     description: 'Warm beige finish',
     popular: false
   }
@@ -111,7 +115,7 @@ export const WALLPAPER_PATTERNS: Variant[] = [
     id: 'floral',
     name: 'Floral',
     value: 'floral',
-    thumbnail: '#FFB6C1', // Light pink
+    thumbnail: '/images/thumbnails/wallpaper/floral.jpg', // ← Wallpaper pattern photo
     description: 'Classic floral design',
     popular: true
   },
@@ -119,7 +123,7 @@ export const WALLPAPER_PATTERNS: Variant[] = [
     id: 'geometric',
     name: 'Geometric',
     value: 'geometric',
-    thumbnail: '#87CEEB', // Sky blue
+    thumbnail: '/images/thumbnails/wallpaper/geometric.jpg',
     description: 'Modern geometric patterns',
     popular: true
   },
@@ -127,7 +131,7 @@ export const WALLPAPER_PATTERNS: Variant[] = [
     id: 'striped',
     name: 'Striped',
     value: 'striped',
-    thumbnail: '#D3D3D3', // Light gray
+    thumbnail: '/images/thumbnails/wallpaper/striped.jpg',
     description: 'Vertical or horizontal stripes',
     popular: true
   },
@@ -135,7 +139,7 @@ export const WALLPAPER_PATTERNS: Variant[] = [
     id: 'textured',
     name: 'Textured',
     value: 'textured',
-    thumbnail: '#F5F5DC', // Beige
+    thumbnail: '/images/thumbnails/wallpaper/textured.jpg',
     description: '3D textured surface',
     popular: false
   },
@@ -143,7 +147,7 @@ export const WALLPAPER_PATTERNS: Variant[] = [
     id: 'damask',
     name: 'Damask',
     value: 'damask',
-    thumbnail: '#C9B8A3', // Greige
+    thumbnail: '/images/thumbnails/wallpaper/damask.jpg',
     description: 'Elegant damask pattern',
     popular: false
   }

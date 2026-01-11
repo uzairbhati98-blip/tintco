@@ -105,7 +105,7 @@ export function VariantSelector({
               variants={allVariants}
               selectedVariant={selectedVariant?.value || null}
               onVariantSelect={handleVariantSelect}
-              compact={false}
+              compact={true}
             />
           </motion.div>
         )}
