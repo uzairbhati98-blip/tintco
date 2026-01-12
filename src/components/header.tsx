@@ -2,9 +2,8 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { ShoppingCart, Search, User2 } from "lucide-react"
+import { ShoppingCart, User2 } from "lucide-react"
 import { useCart } from "@/lib/store/cart"
-import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import type { NextFontWithVariable } from "next/dist/compiled/@next/font"
 
@@ -49,7 +48,7 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
             />
           </motion.div>
 
-          {/* ✅ Brand Name — uses Playfair Display only here */}
+          {/* Brand Name */}
           <motion.span
             className={`${brandFont.className} text-4xl sm:text-5xl font-bold tracking-tight text-brand`}
             initial={{ opacity: 0, y: -8 }}
@@ -76,11 +75,8 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
           </Link>
         </nav>
 
-        {/* Actions */}
+        {/* Actions - Search button removed */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="Search">
-            <Search className="h-5 w-5" />
-          </Button>
           <Link href="/signin" aria-label="Account" className="p-2 rounded-xl hover:bg-black/5">
             <User2 className="h-5 w-5" />
           </Link>

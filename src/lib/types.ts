@@ -19,17 +19,25 @@ export type Product = {
   arMeasureEnabled: boolean;
   colorPickerEnabled?: boolean;
   colorVariants?: Record<string, string[]>;
-  // NEW: Generic variant system
   variantType?: 'color' | 'material' | 'pattern' | 'finish';
-  variants?: Record<string, string[]>; // key: variant id, value: image paths
+  variants?: Record<string, string[]>;
 }
 
+// UPDATED: CartItem now includes variant information
 export type CartItem = {
   productId: string;
   name: string;
   price: number;
   quantity: number;
   image: string;
+  // NEW: Variant tracking
+  variant?: {
+    type: 'color' | 'material' | 'pattern' | 'finish';
+    name: string;
+    value: string; // e.g., "#FFFFFF" or "oak" or "marble-white"
+  };
+  // NEW: Unique key for cart item (productId + variant)
+  cartItemId: string;
 }
 
 export type ARMeasurement = {
@@ -82,14 +90,14 @@ export interface PaintCustomization {
   finish: FinishType | null
 }
 
-// NEW: GENERIC VARIANT SYSTEM
+// GENERIC VARIANT SYSTEM
 export type VariantType = 'color' | 'material' | 'pattern' | 'finish'
 
 export interface Variant {
   id: string
   name: string
-  value: string // For colors: hex code, for others: identifier
-  thumbnail?: string // Optional preview image/color
+  value: string
+  thumbnail?: string
   description?: string
   popular?: boolean
 }
@@ -98,4 +106,33 @@ export interface SelectedVariant {
   id: string
   name: string
   value: string
+}
+
+// CHECKOUT & ORDER TYPES
+export interface CheckoutFormData {
+  // Customer Info
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  
+  // Address
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  
+  // Optional
+  notes?: string;
+}
+
+export interface OrderData {
+  orderId: string;
+  orderDate: string;
+  customer: CheckoutFormData;
+  items: CartItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  status: 'pending' | 'processing' | 'completed' | 'cancelled';
 }
