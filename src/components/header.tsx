@@ -1,14 +1,28 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ShoppingCart, User2 } from "lucide-react"
 import { useCart } from "@/lib/store/cart"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import type { NextFontWithVariable } from "next/dist/compiled/@next/font"
 
 export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
   const count = useCart((s) => s.count)
+  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+
+  // Fix hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const handleCartClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    router.push('/cart')
+  }
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur bg-[#fffdf5]/80 border-b border-brand/30 shadow-subtle">
@@ -75,12 +89,18 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
           </Link>
         </nav>
 
-        {/* Actions - Search button removed */}
+        {/* Actions */}
         <div className="flex items-center gap-2">
           <Link href="/signin" aria-label="Account" className="p-2 rounded-xl hover:bg-black/5">
             <User2 className="h-5 w-5" />
           </Link>
-          <Link href="/cart" aria-label="Cart" className="relative p-2 rounded-xl hover:bg-black/5">
+          
+          {/* Cart Button with proper navigation */}
+          <button
+            onClick={handleCartClick}
+            aria-label="Cart" 
+            className="relative p-2 rounded-xl hover:bg-black/5 transition-colors"
+          >
             <motion.div
               key={count}
               animate={{ scale: [1, 1.2, 1] }}
@@ -89,7 +109,7 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
               <ShoppingCart className="h-5 w-5" />
             </motion.div>
 
-            {count > 0 && (
+            {mounted && count > 0 && (
               <motion.span
                 key={`count-${count}`}
                 initial={{ scale: 0.6, opacity: 0 }}
@@ -101,7 +121,7 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
                 {count}
               </motion.span>
             )}
-          </Link>
+          </button>
         </div>
       </div>
     </header>
