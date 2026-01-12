@@ -1,28 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ShoppingCart, User2 } from "lucide-react"
+import { ShoppingCart, Search, User2 } from "lucide-react"
 import { useCart } from "@/lib/store/cart"
-import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import type { NextFontWithVariable } from "next/dist/compiled/@next/font"
 
-export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
+export function Header() {
   const count = useCart((s) => s.count)
-  const router = useRouter()
-  const [mounted, setMounted] = useState(false)
-
-  // Fix hydration
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const handleCartClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    router.push('/cart')
-  }
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur bg-[#fffdf5]/80 border-b border-brand/30 shadow-subtle">
@@ -62,9 +48,10 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
             />
           </motion.div>
 
-          {/* Brand Name */}
+          {/* Brand Name - uses Playfair Display from CSS variable */}
           <motion.span
-            className={`${brandFont.className} text-4xl sm:text-5xl font-bold tracking-tight text-brand`}
+            className="text-4xl sm:text-5xl font-bold tracking-tight text-brand"
+            style={{ fontFamily: 'var(--font-playfair)' }}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -91,16 +78,13 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" aria-label="Search">
+            <Search className="h-5 w-5" />
+          </Button>
           <Link href="/signin" aria-label="Account" className="p-2 rounded-xl hover:bg-black/5">
             <User2 className="h-5 w-5" />
           </Link>
-          
-          {/* Cart Button with proper navigation */}
-          <button
-            onClick={handleCartClick}
-            aria-label="Cart" 
-            className="relative p-2 rounded-xl hover:bg-black/5 transition-colors"
-          >
+          <Link href="/cart" aria-label="Cart" className="relative p-2 rounded-xl hover:bg-black/5">
             <motion.div
               key={count}
               animate={{ scale: [1, 1.2, 1] }}
@@ -109,7 +93,7 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
               <ShoppingCart className="h-5 w-5" />
             </motion.div>
 
-            {mounted && count > 0 && (
+            {count > 0 && (
               <motion.span
                 key={`count-${count}`}
                 initial={{ scale: 0.6, opacity: 0 }}
@@ -121,7 +105,7 @@ export function Header({ brandFont }: { brandFont: NextFontWithVariable }) {
                 {count}
               </motion.span>
             )}
-          </button>
+          </Link>
         </div>
       </div>
     </header>

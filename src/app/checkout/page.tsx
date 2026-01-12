@@ -8,6 +8,7 @@ import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Loader2, ShoppingBag, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { getNextOrderNumber } from '@/lib/order-number-generator'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -23,6 +24,7 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zipCode: '',
+    visitDate: '', // NEW: Date field
     notes: ''
   })
 
@@ -55,23 +57,41 @@ export default function CheckoutPage() {
     setIsProcessing(true)
 
     try {
-      // Generate order ID
-      const orderId = `ORD-${Date.now()}`
+      // Generate sequential order number: TINT-0001, TINT-0002, etc.
+      const orderId = getNextOrderNumber()
+      
+      // Create full timestamp for the order
+      const now = new Date()
+      const orderTimestamp = now.toISOString()
 
       // Prepare order data for n8n
       const orderData = {
         orderId,
-        orderDate: new Date().toISOString(),
-        customer: formData,
+        orderDate: orderTimestamp,
+        customer: {
+          ...formData,
+          visitDate: formData.visitDate || null // Include preferred visit date
+        },
         items: items.map(item => ({
           productId: item.productId,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
+          image: item.image,
           variant: item.variant ? {
             type: item.variant.type,
             name: item.variant.name,
             value: item.variant.value
+          } : null,
+          paintCustomization: item.paintCustomization ? {
+            color: {
+              name: item.paintCustomization.color.name,
+              hex: item.paintCustomization.color.hex
+            },
+            finish: {
+              type: item.paintCustomization.finish.type,
+              name: item.paintCustomization.finish.name
+            }
           } : null,
           subtotal: item.price * item.quantity
         })),
@@ -81,7 +101,9 @@ export default function CheckoutPage() {
         status: 'pending'
       }
 
-      // Send to n8n webhook
+      console.log('Sending order data:', orderData)
+
+      // Send to n8n webhook via API route
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -90,28 +112,32 @@ export default function CheckoutPage() {
         body: JSON.stringify(orderData)
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to process order')
-      }
-
       const result = await response.json()
+      
+      console.log('API Response:', result)
+
+      if (!response.ok) {
+        throw new Error(result.message || result.error || 'Failed to process order')
+      }
 
       // Clear cart
       clear()
 
       // Show success message
-      toast.success('Order placed successfully!', {
+      toast.success('Site visit scheduled successfully!', {
         description: `Order ID: ${orderId}`,
         duration: 5000
       })
 
       // Redirect to success page
-      router.push(`/order-success?orderId=${orderId}`)
+      setTimeout(() => {
+        router.push(`/order-success?orderId=${orderId}`)
+      }, 500)
 
     } catch (error) {
       console.error('Checkout error:', error)
-      toast.error('Failed to place order', {
-        description: 'Please try again or contact support.',
+      toast.error('Failed to schedule site visit', {
+        description: error instanceof Error ? error.message : 'Please try again or contact support.',
         duration: 5000
       })
     } finally {
@@ -126,6 +152,9 @@ export default function CheckoutPage() {
     }))
   }
 
+  // Get minimum date (today)
+  const today = new Date().toISOString().split('T')[0]
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12">
       <div className="mx-auto max-w-6xl px-4">
@@ -138,7 +167,10 @@ export default function CheckoutPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Cart
           </Link>
-          <h1 className="text-3xl md:text-4xl font-bold">Checkout</h1>
+          <h1 className="text-3xl md:text-4xl font-bold">Schedule Site Visit</h1>
+          <p className="text-text/70 mt-2">
+            Complete your details below to schedule your site visit
+          </p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -208,9 +240,9 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Shipping Address */}
+              {/* Site Visit Address */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h2 className="text-xl font-bold mb-6">Shipping Address</h2>
+                <h2 className="text-xl font-bold mb-6">Site Visit Details</h2>
                 
                 <div className="space-y-4">
                   <div>
@@ -271,9 +303,27 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
+                  {/* NEW: Preferred Visit Date */}
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Order Notes (Optional)
+                      Preferred Visit Date
+                    </label>
+                    <input
+                      type="date"
+                      name="visitDate"
+                      value={formData.visitDate}
+                      onChange={handleChange}
+                      min={today}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                    />
+                    <p className="text-xs text-text/60 mt-1">
+                      Optional - We'll contact you to confirm availability
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Additional Notes (Optional)
                     </label>
                     <textarea
                       name="notes"
@@ -281,7 +331,7 @@ export default function CheckoutPage() {
                       onChange={handleChange}
                       rows={4}
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-                      placeholder="Any special instructions for your order..."
+                      placeholder="Any special requirements or preferences for the site visit..."
                     />
                   </div>
                 </div>
@@ -291,7 +341,7 @@ export default function CheckoutPage() {
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-24">
-                <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+                <h2 className="text-xl font-bold mb-6">Visit Summary</h2>
 
                 {/* Items */}
                 <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
@@ -307,6 +357,11 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{item.name}</p>
+                        {item.paintCustomization && (
+                          <p className="text-xs text-text/60">
+                            {item.paintCustomization.color.name}, {item.paintCustomization.finish.name}
+                          </p>
+                        )}
                         {item.variant && (
                           <p className="text-xs text-text/60">{item.variant.name}</p>
                         )}
@@ -347,12 +402,12 @@ export default function CheckoutPage() {
                       Processing...
                     </>
                   ) : (
-                    'Place Order'
+                    'Schedule Site Visit'
                   )}
                 </button>
 
                 <p className="text-xs text-center text-text/60 mt-4">
-                  By placing your order, you agree to our terms and conditions
+                  Our team will contact you to confirm the visit timing
                 </p>
               </div>
             </div>

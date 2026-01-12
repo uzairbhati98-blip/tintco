@@ -6,11 +6,11 @@ import { Smartphone, DollarSign, Sparkles } from 'lucide-react'
 export default function Home() {
   return (
     <div>
-      {/* Hero Section - Enhanced with animations and proper layout */}
+      {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-white to-gray-50">
-        <div className="mx-auto max-w-7xl px-4 py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-4 py-16 lg:py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content - Animated */}
+            {/* Left Content */}
             <div className="animate-fadeInUp">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
                 Elevate your space with{' '}
@@ -24,15 +24,21 @@ export default function Home() {
               </p>
               <div className="mt-8 flex flex-wrap gap-4 animate-fadeInUp animation-delay-200">
                 <Link 
-                  className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95" 
+                  className="inline-flex rounded-2xl bg-brand hover:bg-brand/90 text-black px-8 py-3.5 font-semibold shadow-soft transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 active:scale-95" 
                   href="/categories"
                 >
                   Shop Now
                 </Link>
+                <Link 
+                  className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95" 
+                  href="/quote"
+                >
+                  Get a Quote
+                </Link>
               </div>
             </div>
             
-            {/* Right Image - Properly aligned */}
+            {/* Right Image */}
             <div className="relative lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 animate-fadeIn">
               <div className="aspect-[4/3] lg:aspect-auto lg:h-full rounded-2xl lg:rounded-l-3xl overflow-hidden shadow-2xl">
                 <Image 
@@ -52,15 +58,16 @@ export default function Home() {
         <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-brand/10 rounded-full blur-3xl animate-float" />
       </section>
 
-      {/* Category Highlights - Enhanced hover effects */}
-      <section className="mx-auto max-w-7xl px-4 py-20">
-        <div className="text-center mb-12 animate-fadeInUp">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Services</h2>
+      {/* Category Highlights - 4 COLUMNS IN ONE ROW */}
+      <section className="mx-auto max-w-7xl px-4 py-12">
+        <div className="text-center mb-8 animate-fadeInUp">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">Our Services</h2>
           <p className="text-text/60 max-w-2xl mx-auto">
             Transform any space with our premium interior solutions
           </p>
         </div>
         
+        {/* CHANGED: grid-cols-4 to fit all 4 in one row */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
@@ -77,21 +84,21 @@ export default function Home() {
             },
             {
               title: 'Flooring',
-              href: '/categories/flooring',
+              href: '/categories/Flooring',
               img: '/images/category-flooring.png',
               description: 'Durable and stylish floor coatings'
             },
             {
               title: 'Tiles',
-              href: '/categories/tiles',
+              href: '/categories/Tiles',
               img: '/images/category-tiles.jpeg',
-              description: 'Durable and stylish floor coatings'
+              description: 'Beautiful ceramic and porcelain tiles'
             }
           ].map((c, i) => (
             <Link 
               key={c.title} 
               href={c.href} 
-              className="rounded-2xl overflow-hidden border card-hover animate-fadeInUp"
+              className="group rounded-2xl overflow-hidden border card-hover animate-fadeInUp"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <div className="relative aspect-[4/3] overflow-hidden">
@@ -100,12 +107,12 @@ export default function Home() {
                   alt={c.title} 
                   fill 
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2 group-hover:text-brand transition-colors duration-300">
+              <div className="p-5">
+                <h3 className="text-lg font-semibold mb-1.5 group-hover:text-brand transition-colors duration-300">
                   {c.title}
                 </h3>
                 <p className="text-sm text-text/60">
@@ -117,11 +124,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How it works - Animated */}
+      {/* How it works */}
       <section className="bg-gradient-to-b from-gray-50 to-white">
-        <div className="mx-auto max-w-7xl px-4 py-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+        <div className="mx-auto max-w-7xl px-4 py-12">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">How It Works</h2>
             <p className="text-text/60 max-w-2xl mx-auto">
               Get your dream space in three simple steps
             </p>
@@ -135,12 +142,12 @@ export default function Home() {
               {
                 icon: <Smartphone className="w-10 h-10" />,
                 title: 'Measure with AR',
-                description: 'Use your phone to instantly measure walls'
+                description: 'Use your phone camera to instantly measure walls and spaces'
               },
               {
                 icon: <DollarSign className="w-10 h-10" />,
                 title: 'Get instant estimate',
-                description: 'Get an estimate in seconds'
+                description: 'Our calculator gives you an estimated price in seconds'
               },
               {
                 icon: <Sparkles className="w-10 h-10" />,
@@ -177,10 +184,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials - Enhanced with carousel feel */}
-      <section className="mx-auto max-w-7xl px-4 py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Clients Say</h2>
+      {/* Testimonials */}
+      <section className="mx-auto max-w-7xl px-4 py-12">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">What Our Clients Say</h2>
           <p className="text-text/60 max-w-2xl mx-auto">
             Join thousands of satisfied customers
           </p>
@@ -222,18 +229,24 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-brand/10 to-brand/5 py-16">
+      <section className="bg-gradient-to-r from-brand/10 to-brand/5 py-12">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 animate-fadeInUp">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3 animate-fadeInUp">
             Ready to Transform Your Space?
           </h2>
-          <p className="text-lg text-text/70 mb-8 animate-fadeInUp animation-delay-100">
+          <p className="text-lg text-text/70 mb-6 animate-fadeInUp animation-delay-100">
             Get started with a free quote or browse our catalog
           </p>
           <div className="flex flex-wrap gap-4 justify-center animate-fadeInUp animation-delay-200">
             <Link 
+              href="/quote"
+              className="inline-flex rounded-2xl bg-brand hover:bg-brand/90 text-black px-8 py-4 font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Get Your Free Quote
+            </Link>
+            <Link 
               href="/categories"
-              className="inline-flex rounded-2xl border-2 border-text/20 hover:border-brand px-8 py-3.5 font-semibold transition-all duration-300 hover:bg-brand/5 hover:-translate-y-0.5 active:scale-95"
+              className="inline-flex rounded-2xl bg-white hover:bg-gray-50 text-text px-8 py-4 font-semibold shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
             >
               View Our Catalog
             </Link>

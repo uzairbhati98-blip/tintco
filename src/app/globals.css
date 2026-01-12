@@ -17,6 +17,9 @@
   --surface-bg: #ffffff;
   --surface-radius: 1rem;
   --surface-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  
+  /* NEW: Font System */
+  --font-playfair: 'Playfair Display', serif;
 }
 
 /* ===================================
@@ -26,11 +29,19 @@
 html, body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-playfair), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.01em;
 }
 
 * {
   scroll-behavior: smooth;
+  font-family: var(--font-playfair);
+}
+
+/* Enhanced typography for decorative font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair);
+  letter-spacing: 0.02em;
 }
 
 /* Page container */
@@ -101,13 +112,15 @@ html, body {
    =================================== */
 
 .card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-color: rgb(0 0 0 / 2);
   will-change: transform;
 }
 
 .card-hover:hover {
   transform: translateY(-4px) translateZ(0);
-  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.12);
+  border-color: rgb(0 0 0 / 2);
 }
 
 .active\:scale-95:active {
@@ -256,18 +269,6 @@ a, button {
   }
 }
 
-/* Card Hover Effect */
-.card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-color: rgb(0 0 0 / 2);
-}
-
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgb(0 0 0 / 0.12);
-  border-color: rgb(0 0 0 / 2); /* brand color with opacity */
-}
-
 /* Print styles */
 @media print {
   .no-print {
@@ -293,6 +294,7 @@ a, button {
   border: none;
   outline: none;
   text-decoration: none;
+  font-family: var(--font-playfair);
 }
 
 /* Primary Button (Brand colored) */

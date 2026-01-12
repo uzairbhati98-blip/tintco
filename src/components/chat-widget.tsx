@@ -1,310 +1,222 @@
-"use client"
+'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { X, Send, MessageCircle, Minimize2 } from 'lucide-react'
 
 interface Message {
+  id: string
   text: string
   sender: 'user' | 'bot'
-  id: string
+  timestamp: Date
 }
 
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "👋 Hi! I can help you check your order status or escalate issues to our support team. How can I assist you today?",
-      sender: 'bot'
+      text: 'Hi! I\'m your Tintco AI assistant. How can I help you today?',
+      sender: 'bot',
+      timestamp: new Date()
     }
   ])
   const [inputValue, setInputValue] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
-  // Auto-scroll to bottom when new messages arrive
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
+  // Listen for custom event from contact page
   useEffect(() => {
-    scrollToBottom()
+    const handleOpenChat = () => {
+      setIsOpen(true)
+      setIsMinimized(false)
+    }
+
+    window.addEventListener('openChatWidget', handleOpenChat)
+    
+    return () => {
+      window.removeEventListener('openChatWidget', handleOpenChat)
+    }
+  }, [])
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // Focus input when chat opens
-  useEffect(() => {
-    if (isOpen) {
-      inputRef.current?.focus()
-    }
-  }, [isOpen])
+  const handleSend = async () => {
+    if (!inputValue.trim()) return
 
-  // Get or create session ID
-  const getSessionId = () => {
-    if (typeof window === 'undefined') return 'server'
-    
-    let sessionId = sessionStorage.getItem('chatSessionId')
-    if (!sessionId) {
-      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      sessionStorage.setItem('chatSessionId', sessionId)
-    }
-    return sessionId
-  }
-
-  // Send message to API route
-  const sendMessage = async () => {
-    const message = inputValue.trim()
-    if (!message || isLoading) return
-
-    // Add user message to chat
+    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: message,
-      sender: 'user'
+      text: inputValue,
+      sender: 'user',
+      timestamp: new Date()
     }
+
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
-    setIsLoading(true)
+    setIsTyping(true)
 
-    try {
-      console.log('📤 Sending message:', message)
-
-      // Call internal API route (no CORS issues!)
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message,
-          timestamp: new Date().toISOString(),
-          sessionId: getSessionId()
-        })
-      })
-
-      console.log('📥 Response status:', response.status)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || `HTTP ${response.status}`)
-      }
-
-      const data = await response.json()
-      console.log('✅ Response data:', data)
-
-      // Add bot response
+    // Simulate AI response
+    setTimeout(() => {
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.message || "I received your message!",
-        sender: 'bot'
+        text: 'Thanks for your message! Our team will get back to you shortly. In the meantime, you can browse our products or request a quote.',
+        sender: 'bot',
+        timestamp: new Date()
       }
       setMessages(prev => [...prev, botMessage])
-
-    } catch (error) {
-      console.error('❌ Chat error:', error)
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: error instanceof Error 
-          ? error.message 
-          : "I'm sorry, I'm having trouble connecting right now. Please try again in a moment or contact support@tintco.com",
-        sender: 'bot'
-      }
-      setMessages(prev => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
+      setIsTyping(false)
+    }, 1500)
   }
 
-  // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      sendMessage()
+      handleSend()
     }
   }
 
   return (
     <>
-      {/* Chat Bubble Button - Tintco Brand Colors */}
-      <motion.button
-        className="fixed bottom-5 right-5 z-[9999] w-[60px] h-[60px] rounded-full shadow-lg flex items-center justify-center cursor-pointer"
-        style={{ background: '#FFCA2C' }} // Mustard Gold
-        whileHover={{ scale: 1.1, boxShadow: '0 8px 24px rgba(255, 202, 44, 0.4)' }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle chat"
-      >
-        <svg 
-          className="w-7 h-7"
-          style={{ fill: '#1E1E1E' }} // Almost Black
-          xmlns="http://www.w3.org/2000/svg" 
-          viewBox="0 0 24 24"
-        >
-          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-        </svg>
-      </motion.button>
-
-      {/* Chat Window - Tintco Surface System */}
+      {/* Chat Button */}
       <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-[90px] right-5 z-[9998] w-[380px] h-[calc(100vh-120px)] max-h-[600px] bg-white rounded-2xl flex flex-col overflow-hidden"
-            style={{
-              border: '1px solid rgba(0, 0, 0, 0.08)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
-            }}
+        {!isOpen && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsOpen(true)}
+            data-chat-widget
+            className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-brand rounded-full shadow-2xl flex items-center justify-center text-black hover:bg-brand/90 transition-colors"
           >
-            {/* Header - Tintco Brand */}
-            <div 
-              className="p-6 flex justify-between items-center"
-              style={{ 
-                background: '#FFCA2C', // Mustard Gold
-                color: '#1E1E1E' // Almost Black
-              }}
-            >
-              <div>
-                <h3 className="font-semibold text-base">Tintco Support</h3>
-                <p className="text-xs opacity-80 mt-0.5">We&apos;re here to help!</p>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full transition-all text-2xl leading-none"
-                style={{ 
-                  color: '#1E1E1E',
-                  background: 'transparent'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(30, 30, 30, 0.1)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent'
-                }}
-                aria-label="Close chat"
-              >
-                &times;
-              </button>
-            </div>
-
-            {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto p-6 bg-white flex flex-col gap-3">
-              {messages.map((msg) => (
-                <motion.div
-                  key={msg.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                    msg.sender === 'user'
-                      ? 'self-end rounded-br-sm'
-                      : 'self-start rounded-bl-sm surface'
-                  }`}
-                  style={msg.sender === 'user' ? {
-                    background: '#FFCA2C', // Mustard Gold
-                    color: '#1E1E1E' // Almost Black
-                  } : {
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
-                    color: '#1E1E1E'
-                  }}
-                >
-                  {msg.text}
-                </motion.div>
-              ))}
-
-              {/* Loading Indicator */}
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="self-start px-4 py-4 rounded-2xl rounded-bl-sm surface flex gap-1.5"
-                  style={{ border: '1px solid rgba(0, 0, 0, 0.08)' }}
-                >
-                  {[0, 1, 2].map((i) => (
-                    <motion.div
-                      key={i}
-                      className="w-2 h-2 rounded-full"
-                      style={{ background: '#FFCA2C' }}
-                      animate={{ scale: [0, 1, 0] }}
-                      transition={{
-                        duration: 1.4,
-                        repeat: Infinity,
-                        delay: i * 0.16,
-                        ease: "easeInOut"
-                      }}
-                    />
-                  ))}
-                </motion.div>
-              )}
-
-              {/* Scroll anchor */}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area - Tintco Surface */}
-            <div 
-              className="p-4 bg-white flex gap-3"
-              style={{ borderTop: '1px solid rgba(0, 0, 0, 0.08)' }}
-            >
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                disabled={isLoading}
-                className="flex-1 px-4 py-3 rounded-full text-sm outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  border: '1px solid rgba(0, 0, 0, 0.08)',
-                  color: '#1E1E1E'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#FFCA2C'
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)'
-                }}
-              />
-              <button
-                onClick={sendMessage}
-                disabled={isLoading || !inputValue.trim()}
-                className="px-6 py-3 rounded-full text-sm font-semibold transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: '#FFCA2C', // Mustard Gold
-                  color: '#1E1E1E' // Almost Black
-                }}
-                onMouseEnter={(e) => {
-                  if (!isLoading && inputValue.trim()) {
-                    e.currentTarget.style.opacity = '0.9'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = '1'
-                }}
-              >
-                Send
-              </button>
-            </div>
-          </motion.div>
+            <MessageCircle className="w-8 h-8" />
+          </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Mobile Responsive - Full Screen on Small Devices */}
-      <style jsx global>{`
-        @media (max-width: 480px) {
-          .fixed.bottom-\\[90px\\].right-5.z-\\[9998\\] {
-            bottom: 0 !important;
-            right: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100vh !important;
-            max-height: 100vh !important;
-            border-radius: 0 !important;
-          }
-        }
-      `}</style>
+      {/* Chat Window */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 100, scale: 0.8 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              height: isMinimized ? '60px' : '600px'
+            }}
+            exit={{ opacity: 0, y: 100, scale: 0.8 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed bottom-6 right-6 z-50 w-[400px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col"
+          >
+            {/* Header */}
+            <div className="bg-brand p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 text-brand" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-black">Tintco Assistant</h3>
+                  <p className="text-xs text-black/70">Online now</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsMinimized(!isMinimized)}
+                  className="p-1 hover:bg-black/10 rounded-lg transition-colors"
+                >
+                  <Minimize2 className="w-5 h-5 text-black" />
+                </button>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-1 hover:bg-black/10 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-black" />
+                </button>
+              </div>
+            </div>
+
+            {!isMinimized && (
+              <>
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                  {messages.map((message) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                          message.sender === 'user'
+                            ? 'bg-brand text-black'
+                            : 'bg-white text-text border border-gray-200'
+                        }`}
+                      >
+                        <p className="text-sm">{message.text}</p>
+                        <p className={`text-xs mt-1 ${
+                          message.sender === 'user' ? 'text-black/60' : 'text-text/50'
+                        }`}>
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-white text-text border border-gray-200 rounded-2xl px-4 py-3">
+                        <div className="flex gap-1">
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input */}
+                <div className="p-4 border-t border-gray-200 bg-white">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Type your message..."
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent text-sm"
+                    />
+                    <button
+                      onClick={handleSend}
+                      disabled={!inputValue.trim()}
+                      className="px-4 py-2 bg-brand text-black rounded-xl hover:bg-brand/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-text/50 mt-2 text-center">
+                    Powered by Tintco AI
+                  </p>
+                </div>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

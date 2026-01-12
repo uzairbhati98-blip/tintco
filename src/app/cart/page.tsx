@@ -11,12 +11,10 @@ export default function CartPage() {
   const { items, updateQuantity, remove, total, clear } = useCart()
   const [mounted, setMounted] = useState(false)
 
-  // Fix hydration mismatch - only render after mount
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Show loading state during hydration
   if (!mounted) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-20">
@@ -53,8 +51,18 @@ export default function CartPage() {
   }
 
   const subtotal = total()
-  const tax = subtotal * 0.08 // 8% tax
+  const tax = subtotal * 0.08
   const totalAmount = subtotal + tax
+
+  // Helper function to get proper label for variant type
+  const getVariantLabel = (type: string): string => {
+    const labels: Record<string, string> = {
+      'material': 'Material',
+      'pattern': 'Pattern',
+      'finish': 'Finish'
+    }
+    return labels[type] || type.charAt(0).toUpperCase() + type.slice(1)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-6 md:py-12">
@@ -85,7 +93,7 @@ export default function CartPage() {
                   className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100"
                 >
                   <div className="flex gap-3 md:gap-4">
-                    {/* Product Image - Fixed mobile size */}
+                    {/* Product Image */}
                     <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
                       <Image
                         src={item.image}
@@ -96,30 +104,45 @@ export default function CartPage() {
                       />
                     </div>
 
-                    {/* Product Info - Mobile optimized */}
+                    {/* Product Info */}
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
                         <h3 className="font-semibold text-base md:text-lg mb-1 line-clamp-2">
                           {item.name}
                         </h3>
                         
-                        {/* Variant Display - Mobile friendly */}
-                        {item.variant && (
-                          <div className="flex items-center gap-2 mb-2">
-                            {item.variant.type === 'color' && (
+                        {/* FIXED: Paint Customization Display (Color + Finish) */}
+                        {item.paintCustomization && (
+                          <div className="space-y-1 mb-2">
+                            {/* Color */}
+                            <div className="flex items-center gap-2">
                               <div
                                 className="w-4 h-4 md:w-5 md:h-5 rounded-full border-2 border-gray-300 flex-shrink-0"
-                                style={{ backgroundColor: item.variant.value }}
+                                style={{ backgroundColor: item.paintCustomization.color.hex }}
                               />
-                            )}
-                            <div className="flex flex-wrap items-center gap-1 text-xs md:text-sm">
-                              <span className="text-text/60 capitalize">
-                                {item.variant.type}:
-                              </span>
-                              <span className="font-medium truncate">
-                                {item.variant.name}
+                              <span className="text-xs md:text-sm font-medium">
+                                {item.paintCustomization.color.name}
                               </span>
                             </div>
+                            {/* Finish - Only shown for paint */}
+                            <div className="flex items-center gap-2 text-xs md:text-sm">
+                              <span className="text-text/60">Finish:</span>
+                              <span className="font-medium">
+                                {item.paintCustomization.finish.name}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* FIXED: Generic Variant Display (Material/Pattern/Finish for non-paint) */}
+                        {item.variant && !item.paintCustomization && (
+                          <div className="flex items-center gap-2 mb-2 text-xs md:text-sm">
+                            <span className="text-text/60 capitalize">
+                              {getVariantLabel(item.variant.type)}:
+                            </span>
+                            <span className="font-medium truncate">
+                              {item.variant.name}
+                            </span>
                           </div>
                         )}
 
@@ -128,9 +151,8 @@ export default function CartPage() {
                         </p>
                       </div>
 
-                      {/* Mobile: Quantity and Remove in row */}
+                      {/* Mobile: Controls in row */}
                       <div className="flex items-center justify-between mt-3 md:hidden">
-                        {/* Quantity Controls */}
                         <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
                           <button
                             onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
@@ -151,12 +173,10 @@ export default function CartPage() {
                           </button>
                         </div>
 
-                        {/* Total Price */}
                         <p className="text-base font-bold">
                           ${(item.price * item.quantity).toFixed(2)}
                         </p>
 
-                        {/* Remove Button */}
                         <button
                           onClick={() => remove(item.cartItemId)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -167,7 +187,7 @@ export default function CartPage() {
                       </div>
                     </div>
 
-                    {/* Desktop: Quantity Controls on Right */}
+                    {/* Desktop: Controls on Right */}
                     <div className="hidden md:flex flex-col items-end gap-3 flex-shrink-0">
                       <button
                         onClick={() => remove(item.cartItemId)}
@@ -207,7 +227,7 @@ export default function CartPage() {
             </AnimatePresence>
           </div>
 
-          {/* Order Summary - Mobile sticky at bottom */}
+          {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100 lg:sticky lg:top-24">
               <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6">Order Summary</h2>

@@ -6,23 +6,34 @@ import { VariantSelector } from './variant-selector'
 import { getMaterialsByProduct, getPopularMaterials } from '@/lib/variants/materials'
 import { getPatternsByProduct, getPopularPatterns } from '@/lib/variants/patterns'
 import { getFinishesByProduct, getPopularFinishes } from '@/lib/variants/finishes'
-import type { Product, SelectedColor, SelectedVariant } from '@/lib/types'
+import type { Product, SelectedColor, SelectedVariant, FinishType } from '@/lib/types'
 
 interface ProductCustomizerProps {
   product: Product
   onColorChange?: (color: SelectedColor | null) => void
   onVariantChange?: (variant: SelectedVariant | null) => void
+  onPaintCustomization?: (customization: { color: SelectedColor | null; finish: FinishType | null }) => void
 }
 
 export function ProductCustomizer({ 
   product, 
   onColorChange,
-  onVariantChange 
+  onVariantChange,
+  onPaintCustomization 
 }: ProductCustomizerProps) {
+  const [selectedVariant, setSelectedVariant] = useState<SelectedVariant | null>(null)
   
   // Determine what type of customization to show
   const showColorPicker = product.colorPickerEnabled === true && product.slug === 'classic-paint'
   const showVariantSelector = product.variantType && product.slug !== 'micro-cement-wall'
+
+  // Handle variant selection
+  const handleVariantSelect = (variant: SelectedVariant | null) => {
+    setSelectedVariant(variant)
+    if (onVariantChange) {
+      onVariantChange(variant)
+    }
+  }
 
   // If neither, show nothing
   if (!showColorPicker && !showVariantSelector) {
@@ -34,7 +45,10 @@ export function ProductCustomizer({
     return (
       <div className="space-y-8">
         <div className="p-6 bg-white rounded-2xl border-2 border-gray-100">
-          <PaintCustomizer onColorChange={onColorChange} />
+          <PaintCustomizer 
+            onColorChange={onColorChange}
+            onCustomizationChange={onPaintCustomization}
+          />
         </div>
       </div>
     )
@@ -71,7 +85,7 @@ export function ProductCustomizer({
           variantType={product.variantType}
           allVariants={variants}
           popularVariants={popularVariants}
-          onVariantChange={onVariantChange}
+          onVariantChange={handleVariantSelect}
         />
       </div>
     )

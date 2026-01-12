@@ -23,20 +23,30 @@ export type Product = {
   variants?: Record<string, string[]>;
 }
 
-// UPDATED: CartItem now includes variant information
+// UPDATED: CartItem now includes BOTH color AND finish for paint products
 export type CartItem = {
   productId: string;
   name: string;
   price: number;
   quantity: number;
   image: string;
-  // NEW: Variant tracking
+  // Generic variant (materials, patterns, finishes)
   variant?: {
-    type: 'color' | 'material' | 'pattern' | 'finish';
+    type: 'material' | 'pattern' | 'finish';
     name: string;
-    value: string; // e.g., "#FFFFFF" or "oak" or "marble-white"
+    value: string;
   };
-  // NEW: Unique key for cart item (productId + variant)
+  // Paint-specific: Color + Finish
+  paintCustomization?: {
+    color: {
+      name: string;
+      hex: string;
+    };
+    finish: {
+      type: FinishType;
+      name: string;
+    };
+  };
   cartItemId: string;
 }
 
@@ -110,19 +120,14 @@ export interface SelectedVariant {
 
 // CHECKOUT & ORDER TYPES
 export interface CheckoutFormData {
-  // Customer Info
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  
-  // Address
   address: string;
   city: string;
   state: string;
   zipCode: string;
-  
-  // Optional
   notes?: string;
 }
 

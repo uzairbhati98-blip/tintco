@@ -9,7 +9,7 @@ import { ARMeasureButton } from '@/components/ar-measure-button'
 import { Star, Check, Truck, Shield, Palette } from 'lucide-react'
 import { useCart } from '@/lib/store/cart'
 import { useQuote } from '@/lib/store/quote'
-import type { Product, SelectedColor, SelectedVariant } from '@/lib/types'
+import type { Product, SelectedColor, SelectedVariant, FinishType } from '@/lib/types'
 
 interface ProductDisplayClientProps {
   product: Product
@@ -23,34 +23,78 @@ export function ProductDisplayClient({
   reviews = { average: 4.8, count: 127 } 
 }: ProductDisplayClientProps) {
   const [selectedColor, setSelectedColor] = useState<SelectedColor | null>(null)
+  const [selectedFinish, setSelectedFinish] = useState<FinishType | null>(null)
   const [selectedVariant, setSelectedVariant] = useState<SelectedVariant | null>(null)
   
   const add = useCart((s) => s.add)
   const setFromProduct = useQuote((s) => s.setFromProduct)
   
-  // Get the key for image switching (either color hex or variant value)
+  // Get the key for image switching
   const imageKey = selectedColor?.hex || selectedVariant?.value || null
 
-  const handleAddToCart = () => {
-    // Pass variant information to cart
-    add(product, 1, {
-      color: selectedColor || undefined,
-      variant: selectedVariant || undefined
-    })
-
-    // Create descriptive toast message
-    let message = `${product.name}`
-    if (selectedColor) {
-      message += ` (${selectedColor.name})`
-    } else if (selectedVariant) {
-      message += ` (${selectedVariant.name})`
+  // Get finish name from finish type
+  const getFinishName = (finishType: FinishType): string => {
+    const finishNames: Record<FinishType, string> = {
+      'gloss': 'Glossy',
+      'semi-gloss': 'Semi-Glossy',
+      'matte': 'Matte',
+      'marble': 'Marble',
+      'epoxy': 'Epoxy',
+      'microcement': 'Microcement'
     }
-    message += ' added to cart!'
+    return finishNames[finishType] || finishType
+  }
 
-    toast.success(message, {
-      description: 'You can view it in your cart anytime.',
-      duration: 2500
-    })
+  const handleAddToCart = () => {
+    // For paint products: send color + finish
+    if (isPaintProduct && product.colorPickerEnabled) {
+      add(product, 1, {
+        color: selectedColor || undefined,
+        finish: selectedFinish ? {
+          type: selectedFinish,
+          name: getFinishName(selectedFinish)
+        } : undefined
+      })
+
+      // Create descriptive toast
+      let message = `${product.name}`
+      if (selectedColor) {
+        message += ` (${selectedColor.name}`
+        if (selectedFinish) {
+          message += `, ${getFinishName(selectedFinish)}`
+        }
+        message += ')'
+      }
+      message += ' added to cart!'
+
+      toast.success(message, {
+        description: 'You can view it in your cart anytime.',
+        duration: 2500
+      })
+    }
+    // For other products: send generic variant
+    else {
+      add(product, 1, {
+        variant: selectedVariant || undefined
+      })
+
+      let message = `${product.name}`
+      if (selectedVariant) {
+        message += ` (${selectedVariant.name})`
+      }
+      message += ' added to cart!'
+
+      toast.success(message, {
+        description: 'You can view it in your cart anytime.',
+        duration: 2500
+      })
+    }
+  }
+
+  // Handle paint customization changes
+  const handlePaintCustomization = (customization: { color: SelectedColor | null; finish: FinishType | null }) => {
+    setSelectedColor(customization.color)
+    setSelectedFinish(customization.finish)
   }
 
   return (
@@ -129,12 +173,13 @@ export function ProductDisplayClient({
           </div>
         </div>
 
-        {/* Smart Product Customizer - shows color picker OR variant selector OR nothing */}
+        {/* Product Customizer */}
         <div className="mb-8">
           <ProductCustomizer 
             product={product}
-            onColorChange={setSelectedColor}
-            onVariantChange={setSelectedVariant}
+            onColorChange={(color) => setSelectedColor(color)}
+            onVariantChange={(variant) => setSelectedVariant(variant)}
+            onPaintCustomization={handlePaintCustomization}
           />
         </div>
 
