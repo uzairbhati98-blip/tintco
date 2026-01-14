@@ -43,6 +43,12 @@ export default function ContactPage() {
     }))
   }
 
+  // TASK 2: Function to open chat widget
+  const handleLiveChatClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    window.dispatchEvent(new CustomEvent('openChatWidget'))
+  }
+
   const contactInfo = [
     {
       icon: Phone,
@@ -265,13 +271,14 @@ export default function ContactPage() {
                     <Headphones className="w-4 h-4" />
                     Call Support
                   </a>
-                  <a 
-                    href="#"
-                    className="flex items-center gap-3 text-sm font-medium hover:text-brand transition-colors"
+                  {/* TASK 2: Fixed - Now triggers chat widget */}
+                  <button 
+                    onClick={handleLiveChatClick}
+                    className="flex items-center gap-3 text-sm font-medium hover:text-brand transition-colors w-full text-left"
                   >
                     <MessageSquare className="w-4 h-4" />
                     Start Live Chat
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -285,19 +292,20 @@ export default function ContactPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Visit Our Showroom</h2>
             <p className="text-text/60">
-              See our products and finishes in person at our New York showroom
+              See our products and finishes in person at our Kuwait showroom
             </p>
           </div>
           
           {/* Map Placeholder */}
-          <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl">
+          <div className="relative h-96 border-2 rounded-3xl overflow-hidden shadow-xl">
             <div className="absolute inset-0 bg-gradient-to-br from-brand/20 to-brand/10 flex items-center justify-center">
               <div className="text-center">
                 <MapPin className="w-12 h-12 text-brand mx-auto mb-4" />
-                <p className="font-semibold">123 Design Ave, Suite 200</p>
-                <p className="text-text/60">New York, NY 10001</p>
+                <p className="font-semibold">B1 Suad Complex Fahad Al-Salam street</p>
+                <p className="text-text/60">Kuwait City, Kuwait</p>
+                {/* TASK 4: Fixed - Proper Google Maps search link */}
                 <a 
-                  href="https://maps.google.com"
+                  href="https://www.google.com/maps/search/?api=1&query=B1+Suad+Complex+Fahad+Al-Salam+street+Kuwait+City+Kuwait"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-4 text-brand font-medium hover:underline"

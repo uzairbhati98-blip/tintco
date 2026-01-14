@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { VariantPalette } from './variant-palette'
 import type { Variant, VariantType, SelectedVariant } from '@/lib/types'
 
@@ -55,14 +56,20 @@ export function VariantSelector({
           </div>
         )}
 
-        {/* Show More Button */}
+        {/* TASK 5: Enhanced Show More Button with Arrow */}
         {allVariants.length > popularVariants.length && (
           <div className="mb-4">
             <button
               onClick={() => setShowAllVariants(!showAllVariants)}
-              className="text-sm font-medium text-brand hover:text-brand/80 transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-medium text-brand hover:text-brand/80 transition-all group"
             >
-              {showAllVariants ? 'Show Less' : `See All (${allVariants.length})`}
+              <span>{showAllVariants ? 'Show Less' : `See All (${allVariants.length})`}</span>
+              {/* Arrow icon that rotates */}
+              {showAllVariants ? (
+                <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
+              ) : (
+                <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
+              )}
             </button>
           </div>
         )}

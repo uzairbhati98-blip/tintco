@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Send, MessageCircle, Minimize2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Message {
   id: string
@@ -24,6 +25,7 @@ export function ChatWidget() {
   ])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [isSending, setIsSending] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Listen for custom event from contact page
@@ -46,31 +48,72 @@ export function ChatWidget() {
   }, [messages])
 
   const handleSend = async () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() || isSending) return
+
+    const userMessageText = inputValue.trim()
 
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputValue,
+      text: userMessageText,
       sender: 'user',
       timestamp: new Date()
     }
 
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
+    setIsSending(true)
     setIsTyping(true)
 
-    // Simulate AI response
-    setTimeout(() => {
-      const botMessage: Message = {
+    try {
+      // Send to n8n support webhook
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessageText,
+          timestamp: new Date().toISOString(),
+          conversationId: Date.now().toString()
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send message')
+      }
+
+      // Bot response
+      setTimeout(() => {
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: 'Thanks for your message! Our team will get back to you shortly. In the meantime, you can browse our products or request a quote.',
+          sender: 'bot',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, botMessage])
+        setIsTyping(false)
+      }, 1000)
+
+    } catch (error) {
+      console.error('Chat error:', error)
+      
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: 'Thanks for your message! Our team will get back to you shortly. In the meantime, you can browse our products or request a quote.',
+        text: 'Sorry, there was an issue sending your message. Please try again or contact us directly.',
         sender: 'bot',
         timestamp: new Date()
       }
-      setMessages(prev => [...prev, botMessage])
+      
+      setMessages(prev => [...prev, errorMessage])
       setIsTyping(false)
-    }, 1500)
+      
+      toast.error('Failed to send message', {
+        description: 'Please try again or contact us directly'
+      })
+    } finally {
+      setIsSending(false)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -198,11 +241,12 @@ export function ChatWidget() {
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder="Type your message..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent text-sm"
+                      disabled={isSending}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent text-sm disabled:opacity-50"
                     />
                     <button
                       onClick={handleSend}
-                      disabled={!inputValue.trim()}
+                      disabled={!inputValue.trim() || isSending}
                       className="px-4 py-2 bg-brand text-black rounded-xl hover:bg-brand/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Send className="w-5 h-5" />

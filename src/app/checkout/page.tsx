@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
-import { Loader2, ShoppingBag, ArrowLeft } from 'lucide-react'
+import { Loader2, ShoppingBag, ArrowLeft, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { getNextOrderNumber } from '@/lib/order-number-generator'
 
@@ -15,6 +15,7 @@ export default function CheckoutPage() {
   const { items, total, clear } = useCart()
   const [isProcessing, setIsProcessing] = useState(false)
 
+  // TASK 3: Removed state and zipCode for Kuwait-only checkout
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,9 +23,7 @@ export default function CheckoutPage() {
     phone: '',
     address: '',
     city: '',
-    state: '',
-    zipCode: '',
-    visitDate: '', // NEW: Date field
+    visitDate: '',
     notes: ''
   })
 
@@ -57,20 +56,20 @@ export default function CheckoutPage() {
     setIsProcessing(true)
 
     try {
-      // Generate sequential order number: TINT-0001, TINT-0002, etc.
+      // Generate sequential order number
       const orderId = getNextOrderNumber()
       
-      // Create full timestamp for the order
+      // Create timestamp
       const now = new Date()
       const orderTimestamp = now.toISOString()
 
-      // Prepare order data for n8n
+      // Prepare order data
       const orderData = {
         orderId,
         orderDate: orderTimestamp,
         customer: {
           ...formData,
-          visitDate: formData.visitDate || null // Include preferred visit date
+          visitDate: formData.visitDate || null
         },
         items: items.map(item => ({
           productId: item.productId,
@@ -101,9 +100,9 @@ export default function CheckoutPage() {
         status: 'pending'
       }
 
-      console.log('Sending order data:', orderData)
+      console.log('📦 Order Data Being Sent:', JSON.stringify(orderData, null, 2))
 
-      // Send to n8n webhook via API route
+      // Send to API
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -114,31 +113,41 @@ export default function CheckoutPage() {
 
       const result = await response.json()
       
-      console.log('API Response:', result)
+      console.log('📥 API Response:', result)
 
       if (!response.ok) {
-        throw new Error(result.message || result.error || 'Failed to process order')
+        console.error('❌ Checkout failed:', {
+          status: response.status,
+          result: result
+        })
+        
+        throw new Error(
+          result.message || 
+          result.error || 
+          `Checkout failed (${response.status})`
+        )
       }
 
-      // Clear cart
+      // Success!
       clear()
 
-      // Show success message
       toast.success('Site visit scheduled successfully!', {
         description: `Order ID: ${orderId}`,
         duration: 5000
       })
 
-      // Redirect to success page
       setTimeout(() => {
         router.push(`/order-success?orderId=${orderId}`)
       }, 500)
 
     } catch (error) {
-      console.error('Checkout error:', error)
+      console.error('❌ Checkout error:', error)
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      
       toast.error('Failed to schedule site visit', {
-        description: error instanceof Error ? error.message : 'Please try again or contact support.',
-        duration: 5000
+        description: errorMessage,
+        duration: 8000
       })
     } finally {
       setIsProcessing(false)
@@ -152,7 +161,7 @@ export default function CheckoutPage() {
     }))
   }
 
-  // Get minimum date (today)
+  // Get minimum date (today) in YYYY-MM-DD format
   const today = new Date().toISOString().split('T')[0]
 
   return (
@@ -193,6 +202,7 @@ export default function CheckoutPage() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                      placeholder="John"
                     />
                   </div>
 
@@ -207,6 +217,7 @@ export default function CheckoutPage() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                      placeholder="Doe"
                     />
                   </div>
 
@@ -221,6 +232,7 @@ export default function CheckoutPage() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                      placeholder="john@example.com"
                     />
                   </div>
 
@@ -235,12 +247,13 @@ export default function CheckoutPage() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                      placeholder="+965 1234 5678"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Site Visit Address */}
+              {/* Site Visit Details */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold mb-6">Site Visit Details</h2>
                 
@@ -256,56 +269,30 @@ export default function CheckoutPage() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                      placeholder="123 Main Street"
                     />
                   </div>
 
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        City <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        State <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        ZIP Code <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="zipCode"
-                        value={formData.zipCode}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-                      />
-                    </div>
-                  </div>
-
-                  {/* NEW: Preferred Visit Date */}
+                  {/* TASK 3: Removed state and zipCode fields - Kuwait only */}
                   <div>
                     <label className="block text-sm font-medium mb-2">
+                      City <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                      placeholder="Kuwait City"
+                    />
+                  </div>
+
+                  {/* Preferred Visit Date */}
+                  <div className="bg-brand/5 p-4 rounded-xl border-2 border-brand/20">
+                    <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-brand" />
                       Preferred Visit Date
                     </label>
                     <input
@@ -314,10 +301,10 @@ export default function CheckoutPage() {
                       value={formData.visitDate}
                       onChange={handleChange}
                       min={today}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-brand/30 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 bg-white text-lg font-medium"
                     />
-                    <p className="text-xs text-text/60 mt-1">
-                      Optional - We'll contact you to confirm availability
+                    <p className="text-xs text-text/60 mt-2">
+                      💡 Select your preferred date - We'll contact you to confirm availability
                     </p>
                   </div>
 
@@ -331,7 +318,7 @@ export default function CheckoutPage() {
                       onChange={handleChange}
                       rows={4}
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-                      placeholder="Any special requirements or preferences for the site visit..."
+                      placeholder="Any special requirements or preferences..."
                     />
                   </div>
                 </div>
@@ -407,7 +394,7 @@ export default function CheckoutPage() {
                 </button>
 
                 <p className="text-xs text-center text-text/60 mt-4">
-                  Our team will contact you to confirm the visit timing
+                  🔒 Our team will contact you to confirm the visit timing
                 </p>
               </div>
             </div>

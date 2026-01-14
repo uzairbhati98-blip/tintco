@@ -1,47 +1,85 @@
-import { NextResponse } from 'next/server'
+/**
+ * Chat API Route - Sends chat messages to n8n support webhook
+ */
 
-const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    if (!N8N_WEBHOOK_URL) {
-      console.error('❌ N8N_WEBHOOK_URL not configured')
-      return NextResponse.json(
-        { message: 'Server configuration error' },
-        { status: 500 }
-      )
+    const chatData = await request.json()
+
+    console.log('💬 Chat message received:', chatData)
+
+    // Get support webhook URL from env
+    const N8N_SUPPORT_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL
+
+    if (!N8N_SUPPORT_WEBHOOK_URL) {
+      console.warn('⚠️  N8N_WEBHOOK_URL not configured!')
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Message received (webhook not configured)',
+        warning: 'Chat webhook not configured'
+      })
     }
 
-    const body = await request.json()
+    // Prepare payload for n8n
+    const n8nPayload = {
+      type: 'chat',
+      message: chatData.message,
+      timestamp: chatData.timestamp,
+      conversationId: chatData.conversationId,
+      metadata: {
+        source: 'tintco-chat-widget',
+        userAgent: request.headers.get('user-agent') || 'unknown',
+        ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+      }
+    }
 
-    console.log('📤 Sending to n8n:', N8N_WEBHOOK_URL)
-    console.log('📦 Payload:', body)
+    console.log('📤 Sending to n8n:', N8N_SUPPORT_WEBHOOK_URL)
 
-    const response = await fetch(N8N_WEBHOOK_URL, {
+    // Send to n8n
+    const n8nResponse = await fetch(N8N_SUPPORT_WEBHOOK_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(n8nPayload)
     })
 
-    console.log('📥 n8n status:', response.status)
+    console.log('📥 n8n response status:', n8nResponse.status)
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('❌ n8n error:', errorText)
-      throw new Error(`n8n returned ${response.status}`)
+    if (!n8nResponse.ok) {
+      const errorText = await n8nResponse.text()
+      console.error('❌ n8n webhook error:', errorText)
+      throw new Error(`n8n webhook returned ${n8nResponse.status}`)
     }
 
-    const data = await response.json()
-    console.log('✅ n8n response:', data)
+    let n8nResult
+    try {
+      const responseText = await n8nResponse.text()
+      n8nResult = responseText ? JSON.parse(responseText) : { success: true }
+    } catch (e) {
+      n8nResult = { success: true }
+    }
 
-    return NextResponse.json(data)
+    console.log('✅ Chat message sent to n8n')
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Message sent successfully',
+      n8nResponse: n8nResult
+    })
 
   } catch (error) {
     console.error('❌ Chat API error:', error)
+    
     return NextResponse.json(
-      { message: "I'm having trouble connecting. Please try again later." },
+      { 
+        success: false, 
+        error: 'Failed to send message',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }

@@ -78,9 +78,6 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="Search">
-            <Search className="h-5 w-5" />
-          </Button>
           <Link href="/signin" aria-label="Account" className="p-2 rounded-xl hover:bg-black/5">
             <User2 className="h-5 w-5" />
           </Link>

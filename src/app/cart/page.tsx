@@ -249,14 +249,14 @@ export default function CartPage() {
 
               <Link
                 href="/checkout"
-                className="w-full block text-center px-6 py-3 bg-brand text-black rounded-2xl font-medium shadow-sm hover:shadow-md transition-all mb-3 text-sm md:text-base"
+                className="w-full block text-center px-6 py-3 bg-brand text-black rounded-2xl font-medium shadow-sm border-2 hover:shadow-md transition-all mb-3 text-sm md:text-base"
               >
                 Proceed to Checkout
               </Link>
 
               <Link
                 href="/categories"
-                className="w-full block text-center px-6 py-3 border-2 border-gray-200 rounded-2xl font-medium hover:border-brand transition-colors text-sm md:text-base"
+                className="w-full block text-center px-6 py-3 bg-brand text-black rounded-2xl font-medium shadow-sm border-2 hover:shadow-md transition-all mb-3 text-sm md:text-base"
               >
                 Continue Shopping
               </Link>
